@@ -1,0 +1,66 @@
+.sponsor {
+  @apply bg-gray-secondary-1;
+  @apply py-8;
+}
+
+.sponsor--backdrop {
+  @apply bg-cover bg-center bg-no-repeat;
+}
+
+.sponsor__container {
+  @apply flex flex-col items-center;
+}
+
+.sponsor__simple-link {
+  @apply inline-block;
+}
+
+.sponsor__simple-logo {
+  @apply h-32 text-gray-primary-1;
+  max-width: theme('spacing.64');
+}
+
+.sponsor__simple-logo:hover, .sponsor__simple-logo:active, .sponsor__simple-logo:focus {
+  @apply text-gray-primary-2;
+}
+
+.sponsor__card {
+  @apply flex flex-col items-start;
+  @apply p-8 w-full;
+  @apply bg-light shadow;
+}
+
+.sponsor__card-logo {
+  @apply mb-8;
+}
+
+.sponsor__card-logo-img {
+  @apply h-12 w-auto;
+  max-width: calc(100 - theme('spacing.4') * 2);
+}
+
+.sponsor__card-text {
+  @apply leading-relaxed mb-8;
+}
+
+.sponsor__card-btn {
+  @apply my-0;
+}
+
+.sponsor__text {}
+
+@screen sm {
+  .sponsor__container--modern {
+    @apply items-end justify-center;
+  }
+  .sponsor__card {
+    @apply w-full;
+    max-width: 500px;
+  }
+}
+
+@screen md {
+  .sponsor__container--modern {
+    min-height: calc(theme('spacing.64') + theme('spacing.32'));
+  }
+}

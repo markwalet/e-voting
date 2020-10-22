@@ -1,0 +1,45 @@
+/**
+  Button
+*/
+
+.btn {
+  @apply inline-block mx-0 my-4 py-4 px-10;
+  @apply rounded border-none;
+  @apply font-bold no-underline;
+  @apply bg-gray-secondary-2 text-gray-primary-3;
+}
+
+.btn:hover, .btn:active {
+  @apply bg-gray-secondary-2 text-gray-primary-3;
+}
+
+.btn--link {
+  @apply border-0 bg-transparent text-brand-primary-2;
+}
+
+.btn--link:hover, .btn--link:active {
+  @apply border-0 bg-transparent text-brand-primary-1;
+}
+
+.btn--brand {
+  @apply bg-brand-primary-1 border-brand-primary-2 text-light;
+}
+
+.btn--brand:hover, .btn--brand:active {
+  @apply bg-brand-primary-2 border-brand-primary-3 text-white shadow-lg;
+}
+
+.btn--disabled, .btn:disabled {
+  opacity: 0.6;
+  filter: grayscale(100%);
+}
+
+.btn--wide {
+  @apply block text-center;
+}
+
+@screen dark {
+  .btn--brand {
+    @apply bg-brand-primary-1 text-dark;
+  }
+}

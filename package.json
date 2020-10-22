@@ -1,19 +1,39 @@
 {
     "private": true,
     "scripts": {
-        "dev": "npm run development",
-        "development": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
-        "watch": "npm run development -- --watch",
-        "watch-poll": "npm run watch -- --watch-poll",
-        "hot": "cross-env NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --disable-host-check --config=node_modules/laravel-mix/setup/webpack.config.js",
-        "prod": "npm run production",
-        "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
+        "dev": "yarn run development",
+        "development": "npx mix build",
+        "watch": "npx mix watch",
+        "hot": "npx mix watch --hot",
+        "prod": "yarn run production",
+        "production": "npx mix build -p",
+        "build": "yarn run production",
+        "start": "yarn run watch"
     },
     "devDependencies": {
+        "autoprefixer": "^10.0.1",
         "axios": "^0.19",
+        "compression-webpack-plugin": "^6.0.3",
         "cross-env": "^7.0",
-        "laravel-mix": "^5.0.1",
+        "cssnano": "^4.1.10",
+        "eslint": "^7.11.0",
+        "eslint-config-standard": "^14.1.1",
+        "eslint-plugin-import": "^2.22.1",
+        "eslint-plugin-node": "^11.1.0",
+        "eslint-plugin-promise": "^4.2.1",
+        "eslint-plugin-standard": "^4.0.1",
+        "imagemin": "^7.0.1",
+        "imagemin-webpack-plugin": "^2.4.2",
+        "laravel-mix": "^6.0.0-beta",
         "lodash": "^4.17.19",
-        "resolve-url-loader": "^3.1.0"
+        "postcss": "^8.0.0",
+        "postcss-calc": "^7.0.5",
+        "postcss-import": "^13.0.0",
+        "resolve-url-loader": "^3.1.0",
+        "vue-template-compiler": "^2.6.12"
+    },
+    "dependencies": {
+        "@tailwindcss/custom-forms": "^0.2.1",
+        "tailwindcss": "^1.9.5"
     }
 }

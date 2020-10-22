@@ -1,0 +1,23 @@
+/*
+  Text styles
+*/
+
+.text-danger {
+  @apply text-red-primary-1;
+}
+
+.text-success {
+  @apply text-green-primary-1;
+}
+
+.text-warning {
+  @apply text-orange-primary-1;
+}
+
+.text-brand {
+  @apply text-brand-primary-1;
+}
+
+.text-gray {
+  @apply text-gray-primary-2;
+}
