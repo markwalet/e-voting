@@ -1,0 +1,213 @@
+name: "Build, test and deploy Laravel"
+
+on:
+  pull_request:
+  push:
+    branches:
+    - master
+
+jobs:
+  laravel-frontend:
+    name: "Front-end build and test"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache node_modules
+        id: cache-node
+        uses: actions/cache@v1
+        with:
+          path: node_modules
+          key: node-build-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            node-build-${{ env.cache-name }}-
+            node-build-
+
+      - name: Copy environment config
+        run: cp .github/actions.env .env
+
+      - name: Install Yarn dependencies
+        if: steps.cache-node.outputs.cache-hit != 'true'
+        run: yarn install --frozen-lockfile
+
+      - name: Build Front-end
+        run: yarn build
+
+      - name: Publish front-end
+        uses: actions/upload-artifact@master
+        with:
+          name: front-end
+          path: public/
+  laravel-backend:
+    name: "Back-end build and test"
+    needs: [laravel-frontend]
+    runs-on: 'ubuntu-latest'
+    strategy:
+      matrix:
+        php:
+          - '7.4'
+    services:
+      database:
+        image: mysql:5
+        ports:
+          - 13306:3306
+        env:
+          MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+          MYSQL_DATABASE: laravel
+          MYSQL_USER: laravel
+          MYSQL_PASSWORD: laravel
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
+      - name: Setup PHP
+        uses: shivammathur/setup-php@master
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: exif, json, mbstring, bcmath, dom, fileinfo, mysql, gd, imagick
+          coverage: xdebug
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Check for Gumbo Millennium typos
+        run: .github/find-typos.sh
+
+      - name: Cache Composer
+        uses: actions/cache@v1
+        with:
+          path: vendor
+          key: composer-build-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            composer-build-${{ env.cache-name }}-
+            composer-build-
+
+      - name: Cache node_modules
+        uses: actions/cache@v1
+        with:
+          path: node_modules
+          key: node-build-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            node-build-${{ env.cache-name }}-
+            node-build-
+
+      - name: Copy environment config
+        run: cp .github/actions.env .env
+
+      - name: Install composer dependencies
+        run: |
+          composer install --no-suggest --no-progress --no-interaction
+          php artisan key:generate
+
+      - name: Prepare database
+        run: php artisan migrate --seed
+
+      - name: Download front-end
+        uses: actions/download-artifact@master
+        with:
+          name: front-end
+          path: public/
+
+      - name: Install Font Awesome icons
+        run: yarn run postinstall
+
+      - name: Run linters
+        run: composer run lint
+
+      - name: Test optimizing the config
+        run: |
+          php artisan optimize
+          php artisan optimize:clear
+
+      - name: Run unit tests
+        run: |
+          test -d dist || mkdir dist
+          vendor/bin/phpunit --coverage-clover ./dist/coverage-clover.xml
+  deploy:
+    name: "Deploy application"
+    needs: [laravel-frontend, laravel-backend]
+    runs-on: ubuntu-latest
+    if: |
+      (
+        github.event_name == 'push'
+      ) || (
+        github.event_name == 'pull_request' &&
+        github.event.action == 'synchronize' &&
+        github.event.pull_request.draft != true &&
+        github.event.pull_request.base.repo.full_name == 'gumbo-millennium/e-voting' &&
+        github.event.pull_request.head.repo.full_name == 'gumbo-millennium/e-voting'
+      )
+    steps:
+      - name: Setup PHP
+        uses: shivammathur/setup-php@master
+        with:
+          php-version: "7.4"
+          extensions: exif,json,mbstring
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 5
+
+      - name: Determine data for environment
+        id: deployment-data
+        run: .github/bin/prep-env.sh "${{ github.repository }}" "${{ github.event_name }}" "${{ github.head_ref }}" "${{ github.ref }}"
+
+      - name: Install Laravel Envoy
+        run: |
+          composer global require --no-progress laravel/envoy
+          echo "::add-path::$HOME/.composer/vendor/bin/"
+
+      - name: Configure SSH connection
+        run: |
+          mkdir -p ${HOME}/.ssh
+          echo "$SSH_PRIVATE_KEY" > ${HOME}/.ssh/id_deploy
+          chmod 0600 ${HOME}/.ssh/id_deploy
+          echo "Host *" > ${HOME}/.ssh/config
+          echo "    StrictHostKeyChecking no" >> ${HOME}/.ssh/config
+          echo "Host deploy.local" >> ${HOME}/.ssh/config
+          echo "    HostName ${SSH_HOST}" >> ${HOME}/.ssh/config
+          echo "    Port ${SSH_PORT}" >> ${HOME}/.ssh/config
+          echo "    User ${SSH_USER}" >> ${HOME}/.ssh/config
+          echo "    IdentityFile ${HOME}/.ssh/id_deploy" >> ${HOME}/.ssh/config
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+
+      - name: Start Deployment
+        uses: bobheadxi/deployments@v0.4.0
+        id: deployment-start
+        with:
+          step: start
+          env: ${{ steps.deployment-data.outputs.name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run Envoy
+        id: deployment-envoy
+        run: |
+          envoy run deploy \
+            --branch="${{ steps.deployment-data.outputs.branch }}" \
+            --remote="${{ steps.deployment-data.outputs.remote }}" \
+            --hash="${{ steps.deployment-data.outputs.hash }}"
+
+      - name: Finish Deployment (failure)
+        uses: bobheadxi/deployments@v0.4.0
+        if: failure()
+        with:
+          step: finish
+          token: ${{ secrets.GITHUB_TOKEN }}
+          env_url: "null"
+          status: ${{ job.status }}
+          deployment_id: ${{ steps.deployment-start.outputs.deployment_id }}
+
+      - name: Finish Deployment (success)
+        uses: bobheadxi/deployments@v0.4.0
+        if: success()
+        with:
+          step: finish
+          token: ${{ secrets.GITHUB_TOKEN }}
+          env_url: ${{ steps.deployment-data.outputs.app_url }}
+          status: ${{ job.status }}
+          deployment_id: ${{ steps.deployment-start.outputs.deployment_id }}
