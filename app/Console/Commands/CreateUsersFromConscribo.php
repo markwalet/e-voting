@@ -7,6 +7,7 @@ namespace App\Console\Commands;
 use App\Models\User;
 use App\Services\ConscriboService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Date;
 
 class CreateUsersFromConscribo extends Command
 {
@@ -30,15 +31,25 @@ class CreateUsersFromConscribo extends Command
     {
         // Get all users
         foreach ($service->getResource('persoon') as $person) {
+            // Find the user
             $user = User::firstOrNew(['conscribo_id' => (int) $person['id']]);
 
+            // Build the name
             $user->name = implode(' ', array_filter([
                 $person['voornaam'],
                 $person['tussenvoegsel'],
                 $person['naam'],
             ], static fn ($val) => !empty($val)));
+
+            // Assign email and mark as verified
             $user->email = $person['email'];
-            $user->telefoonnummer = $person['telefoonnummer'];
+            $user->email_verified_at = Date::now();
+
+            // Assign phone number
+            $user->phone = (string) $person['telefoonnummer'];
+
+            // Done
+            $user->save();
         }
         return 0;
     }
