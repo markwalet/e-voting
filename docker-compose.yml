@@ -1,0 +1,32 @@
+version: '3.7'
+
+networks:
+  network:
+
+volumes:
+  mysql-data:
+
+services:
+  # MySQL database
+  mysql:
+    image: mysql:8
+    volumes:
+      - mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: 'true'
+      MYSQL_DATABASE: laravel
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: laravel
+    ports:
+      - 2006:3306
+    networks:
+      - network
+
+  # Mailhog (to test e-mail)
+  mail:
+    image: mailhog/mailhog:latest
+    networks:
+      - network
+    ports:
+      - 2000:8025
+      - 2025:1025

@@ -55,6 +55,16 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "scripts": {
+        "contribute": [
+            "Composer\\Config::disableProcessTimeout",
+            "test -f .env || cp .env.dev .env",
+            "docker-compose up -d",
+            "composer install --no-suggest --no-progress",
+            "yarn install",
+            "@php artisan key:generate",
+            "@php artisan migrate --seed",
+            "yarn build"
+        ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"
