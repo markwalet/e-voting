@@ -108,9 +108,6 @@ jobs:
           name: front-end
           path: public/
 
-      - name: Install Font Awesome icons
-        run: yarn run postinstall
-
       - name: Run linters
         run: composer run lint
 
