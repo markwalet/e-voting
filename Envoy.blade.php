@@ -20,9 +20,9 @@ $branch = array_pop($branchBits);
 $hash ??= trim(`git log -1 --format='%H'`);
 
 // Set env from branch
-$isProduction = $branch === 'master';
+$isProduction = $branch === 'production';
 $env = $isProduction ? 'production' : 'staging';
-$domain = $isProduction ? 'e-voting.gumbo-millennium.nl' : 'e-voting-beta.gumbo-millennium.nl';
+$domain = $isProduction ? 'e-voting.gumbo-millennium.nl' : 'beta.e-voting.gumbo-millennium.nl';
 
 // Settings
 $logFormat = '%h %s (%cr, %cn)'; // see `man git log`
