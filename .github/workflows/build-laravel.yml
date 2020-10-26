@@ -5,6 +5,7 @@ on:
   push:
     branches:
     - master
+    - production
 
 jobs:
   laravel-frontend:

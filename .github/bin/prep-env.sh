@@ -18,10 +18,10 @@ DEPLOY_REF="${DEPLOY_REF#refs/heads/}"
 
 # Test what deployment to do
 DEPLOY_NAME=Staging
-DEPLOY_URL=https://e-voting.gumbo-millennium.nl/
-if [ "$DEPLOY_REF" = "master" ]; then
+DEPLOY_URL=https://beta.e-voting.gumbo-millennium.nl/
+if [ "$DEPLOY_REF" = "production" ]; then
     DEPLOY_NAME=Production
-    DEPLOY_URL=https://beta.e-voting.gumbo-millennium.nl/
+    DEPLOY_URL=https://e-voting.gumbo-millennium.nl/
 fi
 
 # Determine hash
