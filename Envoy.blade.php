@@ -67,7 +67,6 @@ deployment_down
 deployment_migrate
 deployment_cache
 deployment_up
-restart_horizon
 deployment_cleanup
 health_check
 @endstory
@@ -203,7 +202,7 @@ fi
 cd "{{ $deployPath }}"
 
 echo -e "\nBuilding front-end"
-yarn build --no-progress
+yarn build
 
 echo -e "\nRemoving node_modules"
 rm -rf "{{ $deployPath }}/node_modules"
@@ -211,9 +210,6 @@ rm -rf "{{ $deployPath }}/node_modules"
 
 @task('deployment_down')
 cd "{{ $deployPath }}"
-
-echo -e "\nStopping Laravel Horizon"
-php artisan horizon:terminate --wait
 
 {{-- Pull down new and current app --}}
 echo -e "\nPulling down platform"
@@ -271,7 +267,6 @@ echo "Cleaned up old deployments"
 
 @story('rollback')
 deployment_rollback
-restart_horizon
 health_check
 @endstory
 
@@ -309,15 +304,6 @@ echo -e "\nGoing back online"
 php artisan up
 
 echo -e "\nRolled back to $( basename "${OLD_VERSION}" )"
-@endtask
-
-@task('restart_horizon')
-cd "{{ $livePath }}"
-
-{{-- Un-pause horizon --}}
-echo -e "\nRestarting Laravel Horizon"
-php artisan horizon:continue
-php artisan horizon:purge
 @endtask
 
 @task('health_check')
