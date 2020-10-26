@@ -16,10 +16,9 @@ interface SendsVerifications
     public function canSendCode(User $user): bool;
 
     /**
-     * Sends the verification code to the given phone number
+     * Sends the user's verification code to the user
      * @param User $user
-     * @param string $code
      * @return bool
      */
-    public function sendVerificationCode(User $user, string $code): bool;
+    public function sendVerificationCode(User $user): bool;
 }

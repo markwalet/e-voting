@@ -13,7 +13,7 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware('guest');
-        $this->middleware('throttle:login')->only('find', 'verify')
+        $this->middleware('throttle:login')->only('find', 'verify');
     }
 
     public function index(Request $request)
@@ -41,7 +41,7 @@ class LoginController extends Controller
         }
 
         return \response()->view('login.token')
-            ->setPrivate()
+            ->setPrivate();
     }
 
     public function verify(Request $request)
