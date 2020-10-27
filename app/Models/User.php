@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use OTPHP\TOTP;
@@ -58,7 +60,8 @@ class User extends Authenticatable
         'password',
         'remember_token',
         'phone',
-        'totp_secret'
+        'totp_secret',
+        'proxy_id'
     ];
 
     /**
@@ -85,5 +88,32 @@ class User extends Authenticatable
         }
 
         return self::getTotp($this->totp_secret);
+    }
+
+    /**
+     * The user that this user's vote is transferred to
+     * @return BelongsTo
+     */
+    public function proxy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'proxy_id');
+    }
+
+    /**
+     * The user that gave an extra vote to this user
+     * @return HasOne
+     */
+    public function proxyFor(): HasOne
+    {
+        return $this->hasOne(User::class, 'proxy_id');
+    }
+
+    /**
+     * Returns true if this user has transferred his vote rights.
+     * @return bool
+     */
+    public function getIsTransferredProperty(): bool
+    {
+        return $this->proxy_id !== null;
     }
 }
