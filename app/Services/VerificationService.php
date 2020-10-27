@@ -89,7 +89,7 @@ final class VerificationService
 
         // Prep token
         $code = $user->totp->at(time());
-        $split = ceil(strlen($code) / 2);
+        $split = (int) ceil(strlen($code) / 2);
         $tokenInParts = \implode(' ', \str_split($code, $split));
 
         // Prep message

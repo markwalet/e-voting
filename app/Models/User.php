@@ -119,4 +119,24 @@ class User extends Authenticatable
     {
         return $this->hasMany(UserVote::class);
     }
+
+    /**
+     * Returns the role the user has
+     * @return string
+     */
+    public function getVoteLabelAttribute()
+    {
+        $rights = [];
+        if ($this->is_voter) {
+            $rights[] = 'Stemmen';
+        }
+        if ($this->can_proxy) {
+            $rights[] = 'Machtingen';
+        }
+        if ($this->is_admin) {
+            $rights[] = 'Admin';
+        }
+
+        return implode(', ', $rights) ?: '–';
+    }
 }

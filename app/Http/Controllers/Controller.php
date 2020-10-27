@@ -24,6 +24,6 @@ class Controller extends BaseController
     protected function sendNotice(string $notice, ...$args): void
     {
         // Flashes the given message in the right key
-        \request()->flash('message', sprintf($notice, ...$args));
+        \request()->session()->put('message', sprintf($notice, ...$args));
     }
 }

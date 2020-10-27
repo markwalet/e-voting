@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\PollController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\LogoutController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -21,6 +22,9 @@ use Illuminate\Support\Facades\Route;
 
 // Homepage
 Route::get('/', static fn () => view('welcome'));
+
+// Logout
+Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 
 // Login
 Route::get('/login', [LoginController::class, 'index'])->name('login');

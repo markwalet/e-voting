@@ -88,7 +88,7 @@ trait SetsUserRights
      * @param array $keys
      * @return bool
      */
-    private function IdInCollection(int $id, Collection $collection, array $keys): bool
+    private function existsInCollection(int $id, Collection $collection, array $keys): bool
     {
         return $collection->only($keys)->collapse()->contains($id);
     }
@@ -106,7 +106,7 @@ trait SetsUserRights
         $admins = $this->getAdminMembers($service);
 
         // Check if in account group or an admin
-        return $this->IdInCollection($id, $groups, self::$accountGroups)
+        return $this->existsInCollection($id, $groups, self::$accountGroups)
             || $admins->contains($id);
     }
 
@@ -125,8 +125,8 @@ trait SetsUserRights
 
         // Assign
         $conscriboId = $user->conscribo_id;
-        $user->is_voter = $this->IdInCollection($conscriboId, $groups, self::$voteGroups);
-        $user->can_proxy = $this->IdInCollection($conscriboId, $groups, self::$proxyGroups);
+        $user->is_voter = $this->existsInCollection($conscriboId, $groups, self::$voteGroups);
+        $user->can_proxy = $this->existsInCollection($conscriboId, $groups, self::$proxyGroups);
         $user->is_admin = $admins->contains($conscriboId);
 
         // Remove proxy if set and if not allowed to vote

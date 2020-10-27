@@ -6,52 +6,12 @@ namespace App\Services\Verification;
 
 use App\Contracts\SendsNotifications;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Session;
-use MessageBird\Client as MessagebirdClient;
-use RuntimeException;
 
 class FlashService implements SendsNotifications
 {
     private const VERIFY_CACHE_NAME = 'verify.dummy.%s';
-
-    /**
-     * Returns clients or throws a fit if token is unset
-     * @return MessagebirdClient
-     * @throws RuntimeException
-     */
-    private static function buildMessagebirdClient(): MessagebirdClient
-    {
-        // Get token
-        $accessToken = Config::get('services.messagebird.access_key');
-
-        // Skip if invalid
-        if (!$accessToken) {
-            throw new RuntimeException('Failed to get MessageBird instance');
-        }
-
-        // Create and return new instance
-        try {
-            return new MessagebirdClient($accessToken);
-        } catch (\Throwable $e) {
-            throw new RuntimeException('Failed to get MessageBird instance', 0, $e);
-        }
-    }
-
-    private ?MessagebirdClient $messageBird = null;
-
-    /**
-     * Makes a new service, using the given client if specified. A client
-     * will be created from config if not set.
-     * @param null|MessagebirdClient $client
-     * @return void
-     */
-    public function __construct(?MessagebirdClient $client = null)
-    {
-        // Assign client
-        $this->messageBird = $client ?? self::buildMessagebirdClient();
-    }
 
     /**
      * @inheritdoc

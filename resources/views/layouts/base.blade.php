@@ -27,7 +27,8 @@
             <div class="flex-grow"></div>
             <div class="text-right">
                 @auth
-                    Ingelogd als <strong>{{ user()->name }}</strong>
+                    Ingelogd als <strong>{{ request()->user()->name }}</strong><br />
+                    <button type="submit" form="logout" class="appearance-none">Uitloggen</button>
                 @else
                     Niet ingelogd<br />
                     <a href="{{ route('login') }}">Inloggen</a>
@@ -38,7 +39,7 @@
         {{-- Messages --}}
         @if (session()->has('message'))
         <div class="rounded p-4 border border-yellow-600 my-4">
-            <p>{{ session()->get('message') }}</p>
+            <p>{{ session()->pull('message') }}</p>
         </div>
         @endif
 
@@ -46,7 +47,7 @@
         @if (Config::get('app.debug') === true && session()->has('debug-message'))
         <div class="rounded p-4 border border-yellow-700 my-4">
             <strong class="text-yellow-700 font-bold block text-sm uppercase">Debug message</strong>
-            <p>{{ session()->get('debug-message') }}</p>
+            <p>{{ session()->pull('debug-message') }}</p>
         </div>
         @endif
 
@@ -57,5 +58,8 @@
             </div>
         @show
     </div>
+
+    {{-- Logout form --}}
+    <form action="{{ route('logout') }}" method="post" id="logout">@csrf</form>
 </body>
 </html>

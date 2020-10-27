@@ -22,6 +22,7 @@ class Kernel extends ConsoleKernel
      * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
      */
+    // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('vote:assign-permissions')->hourly();
