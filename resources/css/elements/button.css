@@ -38,8 +38,3 @@
   @apply block text-center;
 }
 
-@screen dark {
-  .btn--brand {
-    @apply bg-brand-primary-1 text-dark;
-  }
-}

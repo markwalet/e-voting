@@ -7,6 +7,7 @@ namespace App\Console\Commands;
 use App\Models\User;
 use App\Services\ConscriboService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -14,6 +15,16 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class CreateUsersFromConscribo extends Command
 {
+
+    /**
+     * Groups that allow an account
+     */
+    private const CREATE_USER_GROUPS = ['lid', 'erelid', 'a-leden', 'oud-lid', 'begunstigers'];
+
+    /**
+     * Groups that allow is_vote to be true
+     */
+    private const ALLOW_VOTING_GROUPS = ['lid', 'erelid'];
     /**
      * The name and signature of the console command.
      * @var string
@@ -24,7 +35,7 @@ class CreateUsersFromConscribo extends Command
      * The console command description.
      * @var string
      */
-    protected $description = 'Creates all users from Conscribo as users in this system';
+    protected $description = 'Creates users from Conscribo, that are likely to use this sytem. Updates `is_voter`';
 
     /**
      * Execute the console command.
@@ -32,40 +43,96 @@ class CreateUsersFromConscribo extends Command
      */
     public function handle(ConscriboService $service)
     {
+        // Get roles
+        $this->line('Fetching roles...', null, OutputInterface::VERBOSITY_VERBOSE);
+        $roles = $this->getMappedGroupIds($service);
+        $this->info("Retrieved {$roles->count()} role(s)");
+
         // Get people
         $this->line('Fetching users...', null, OutputInterface::VERBOSITY_VERBOSE);
-        $people = $service->getResource('persoon');
-
-        $totalCount = count($people);
-        $this->info("Retrieved $totalCount user(s)");
+        $people = collect($service->getResource('persoon'));
+        $this->info("Retrieved {$people->count()} user(s)");
 
         // Disable fill protections
+        $this->createOrUpdateUsersWithRoles($people, $roles);
+
+        // Assign admin roles
+        $this->call('vote:assign-permissions', ['--admin']);
+
+        // Done
+        return 0;
+    }
+
+    /**
+     * Maps all groups to a list of IDs, to allow quick role assignment
+     * @param ConscriboService $service
+     * @return Collection<array<int>>
+     */
+    public function getMappedGroupIds(ConscriboService $service): Collection
+    {
+        // Get groups
+        $groups = $service->getResourceGroups('persoon');
+
+        return collect($groups)
+            ->mapWithKeys(static fn ($group) => [Str::slug($group['name']) => $group['members']]);
+    }
+
+    /**
+     * Update or create users
+     * @param Collection<array> $users
+     * @param Collection<array<int>> $roles
+     * @return void
+     */
+    public function createOrUpdateUsersWithRoles(Collection $users, Collection $roles): void
+    {
+
         User::unguard();
 
         // Prep counts
         $parseCount = 0;
         $newCount = 0;
+        $totalCount = $users->count();
+
+        /**
+         * Checks if a user ID is present in the list of groups
+         * @return bool
+         */
+        $inGroup = static function (int $userId, array $groups) use ($roles) {
+            foreach ($groups as $wanted) {
+                if (isset($roles[$wanted]) && \in_array($userId, $roles[$wanted])) {
+                    return true;
+                }
+            }
+            return false;
+        };
 
         // Get all users
-        foreach ($people as $person) {
+        foreach ($users as $userData) {
             // Parse user ID
-            $userId = \filter_var($person['code'], \FILTER_VALIDATE_INT);
+            $userId = \filter_var($userData['code'], \FILTER_VALIDATE_INT);
+            $userName = $userData['weergavenaam'];
 
             // Throw a fit
             if ($userId === false) {
                 $this->error(
-                    "Skipping {$person['weergavenaam']}, ID not parseable",
+                    "Skipping {$userName}, ID not parseable",
                     OutputInterface::VERBOSITY_VERBOSE
                 );
                 continue;
             }
 
             // Require an e-mail address
-            if (empty($person['email'])) {
+            if (empty($userData['email'])) {
                 $this->error(
-                    "Skipping {$person['weergavenaam']}, e-mailadres missing",
+                    "Skipping {$userName}, e-mailadres missing",
                     OutputInterface::VERBOSITY_VERBOSE
                 );
+                continue;
+            }
+
+            // Check if user should be created
+            if (!$inGroup($userId, self::CREATE_USER_GROUPS)) {
+                $this->comment("Ignoring {$userName}, no rights");
                 continue;
             }
 
@@ -74,18 +141,23 @@ class CreateUsersFromConscribo extends Command
 
             // Build the name
             $user->name = implode(' ', array_filter([
-                $person['voornaam'],
-                $person['tussenvoegsel'],
-                $person['naam'],
+                $userData['voornaam'],
+                $userData['tussenvoegsel'],
+                $userData['naam'],
             ], static fn ($val) => !empty($val)));
 
             // Assign email and mark as verified
-            $user->email = $person['email'];
+            $user->email = $userData['email'];
             $user->email_verified_at = Date::now();
 
+            // Update roles
+            $user->is_voter = $inGroup($userId, self::ALLOW_VOTING_GROUPS);
+            $judge = $user->is_voter ? 'allowed' : 'denied';
+            $this->line("User <info>$userName</> vote judgement: <comment>$judge</>.", null);
+
             // Add phone if set
-            if (!empty($person['telefoonnummer'])) {
-                $user->phone = (string) $person['telefoonnummer'];
+            if (!empty($userData['telefoonnummer'])) {
+                $user->phone = (string) $userData['telefoonnummer'];
             } else {
                 $user->phone = null;
             }
@@ -124,7 +196,5 @@ class CreateUsersFromConscribo extends Command
             $totalCount,
             $newCount
         ));
-
-        return 0;
     }
 }

@@ -10,6 +10,7 @@ const defaultTheme = require('tailwindcss/defaultTheme')
 module.exports = {
   plugins: gumboSettings.plugins,
   purge: {
+    mode: 'layers',
     content: [
       'app/**/*.php',
       'config/**/*.php',
@@ -19,9 +20,6 @@ module.exports = {
     ]
   },
   theme: {
-    container: {
-      center: true
-    },
     extend: {
       screens: {
         sm: '640px',
@@ -93,7 +91,6 @@ module.exports = {
     }
   },
   variants: {
-    accessibility: ['focus'],
     alignContent: [],
     alignItems: ['responsive'],
     alignSelf: [],
@@ -165,6 +162,11 @@ module.exports = {
     textOpacity: false,
     borderOpacity: false,
     placeholderOpacity: false,
-    divideOpacity: false
+    divideOpacity: false,
+    container: false,
+    userSelect: false,
+    zIndex: false,
+    whitespace: false,
+    float: false
   }
 }

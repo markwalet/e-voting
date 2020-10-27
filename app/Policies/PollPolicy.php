@@ -7,6 +7,7 @@ namespace App\Policies;
 use App\Models\Poll;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Gate;
 
 class PollPolicy
@@ -31,22 +32,39 @@ class PollPolicy
      */
     public function view(User $user, Poll $poll)
     {
+        // Admins see all
         if (Gate::forUser($user)->allows('admin')) {
             return true;
         }
 
-        return Gate::forUser($user)->allows('view') && $poll->started_at !== null;
+        // Check if started
+        $isStarted = $poll->started_at !== null && $poll->started_at > Date::now();
+        $isNotEnded = $poll->ended_at === null;
+        $isRecentlyEnded = $poll->ended_at > Date::now()->subDay();
+
+        // Allow seeing it if active or recently active
+        return $isStarted && ($isNotEnded || $isRecentlyEnded);
     }
 
     /**
      * Determine whether the user can view the model.
      * @param  \App\Models\User  $user
      * @param  \App\Models\Poll  $poll
-     * @return mixed
+     * @return bool
      */
-    public function vote(User $user, Poll $poll)
+    public function vote(User $user, Poll $poll, ?User $proxy = null): bool
     {
-        if (!Gate::forUser($user)->allows('vote')) {
+        // Disallow if no vote right
+        if (!$user->is_voter) {
+            return false;
+        }
+
+        // Disallow if transferred, or if this is a transfer check
+        // and it's not transferred
+        if (
+            ($user->proxy !== null && !$proxy) ||
+            ($user->proxy === null && $proxy)
+        ) {
             return false;
         }
 

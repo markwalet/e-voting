@@ -47,6 +47,12 @@ final class ConscriboService
         '<>' => ['multicheckbox'],
     ];
 
+    /**
+     * Returns a service from data in the config. Throws a fit
+     * if the config is missing
+     * @return ConscriboService
+     * @throws RuntimeException
+     */
     public static function fromConfig(): self
     {
         $account = Config::get('services.conscribo.account');
@@ -86,13 +92,19 @@ final class ConscriboService
 
     /**
      * Creates service
-     * @param string $account
-     * @param string $username
-     * @param string $password
-     * @param null|Client $httpClient
+     * @param null|string $account
+     * @param null|string $username
+     * @param null|string $password
      */
-    public function __construct(string $account, string $username, string $password)
-    {
+    public function __construct(
+        ?string $account = null,
+        ?string $username = null,
+        ?string $password = null
+    ) {
+        // Get data from config
+        $account ??= Config::get('services.conscribo.account');
+        $username ??= Config::get('services.conscribo.username');
+        $password ??= Config::get('services.conscribo.password');
         // Check
         if (!$account || empty($username) || empty($password)) {
             throw new InvalidArgumentException('Expected a username, password and account.');
@@ -114,7 +126,7 @@ final class ConscriboService
      * @return void
      * @throws ServiceException
      */
-    protected function authenticate(): void
+    public function authenticate(): void
     {
         // Prep body
         $body = $this->buildBody('authenticateWithUserAndPass', [
@@ -127,7 +139,6 @@ final class ConscriboService
 
         $response = Http::withHeaders($headers)
             ->withBody($body, 'application/json')
-            ->withoutVerifying()
             ->post($this->endpoint);
 
         // Throw a fit
@@ -166,7 +177,6 @@ final class ConscriboService
 
         // Send request
         $response = Http::withHeaders($headers)
-            ->withoutVerifying()
             ->withBody($body, 'application/json')
             ->post($this->endpoint);
 

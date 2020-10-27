@@ -3,10 +3,7 @@
 */
 
 @import 'button.css';
-@import 'card-grid.css';
 @import 'card.css';
 @import 'container-variants.css';
-@import 'files.css';
-@import 'site-wide-banner.css';
+@import 'container.css';
 @import "notice.css";
-@import "sponsor.css";

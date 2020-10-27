@@ -18,7 +18,11 @@ class AssignPermissions extends Command
      * The name and signature of the console command.
      * @var string
      */
-    protected $signature = 'vote:assign-permissions';
+    protected $signature = <<<'CMD'
+    vote:assign-permissions
+        {--admin : Update admin role}
+        {--vote : Update vote role}
+    CMD;
 
     /**
      * The console command description.
@@ -33,7 +37,7 @@ class AssignPermissions extends Command
     public function handle(ConscriboService $service)
     {
         // Wrap in a transaction
-        DB::transaction();
+        DB::beginTransaction();
 
         // First off, reset all users
         User::query()->update([
@@ -63,7 +67,7 @@ class AssignPermissions extends Command
             }
 
             // Start
-            $this->line("Applying <comment>admin</> permissions for <info>{$committee['name']}</>");
+            $this->line("Applying <comment>admin</> permissions for <info>{$committee['naam']}</>");
 
             // Simply match by conscribo ID
             User::whereIn('conscribo_id', $committee['members'])->update(['is_admin' => true]);

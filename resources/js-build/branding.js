@@ -5,18 +5,6 @@
 // Get default theme
 const defaultTheme = require('tailwindcss/defaultTheme')
 
-// Shorthand some colors
-const buildNightModeCapable = (color) => {
-  return {
-    'primary-1': `var(--color-${color}-primary-1)`,
-    'primary-2': `var(--color-${color}-primary-2)`,
-    'primary-3': `var(--color-${color}-primary-3)`,
-    'secondary-1': `var(--color-${color}-secondary-1)`,
-    'secondary-2': `var(--color-${color}-secondary-2)`,
-    'secondary-3': `var(--color-${color}-secondary-3)`
-  }
-}
-
 const grayColors = {
   50: '#fafafa',
   100: '#f5f5f5',
@@ -43,37 +31,87 @@ const brandColors = {
   900: '#003900'
 }
 
+const baseTheme = key => {
+  // Get data
+  let out = defaultTheme
+
+  // Iterate over dots
+  for (let item of key.split('.')) {
+    // Get item
+    item = String(item)
+
+    // Fail if missing
+    if (!out.hasOwnProperty(item)) {
+      console.warn('Failed for %o at %o in %o', key, item, out)
+      return null
+    }
+
+    // Descend
+    out = out[item]
+  }
+
+  // Return result
+  return out
+}
+
 const colors = {
-  source: {
-    // Default colors
-    red: defaultTheme.colors.red,
-    orange: defaultTheme.colors.orange,
-    green: defaultTheme.colors.green,
-    blue: defaultTheme.colors.blue,
+  light: defaultTheme.colors.white,
+  dark: grayColors['900'],
 
-    // Our colors
-    gray: grayColors,
-    brand: brandColors
+  // Gray
+  gray: {
+    'primary-1': grayColors['500'],
+    'primary-2': grayColors['600'],
+    'primary-3': grayColors['700'],
+    'secondary-1': grayColors['200'],
+    'secondary-2': grayColors['300'],
+    'secondary-3': grayColors['400']
   },
-
-  // Disable some colors
-  yellow: {},
-  teal: {},
-  indigo: {},
-  purple: {},
-  pink: {},
-
-  // Add night-mode-capable primaries
-  light: 'var(--color-light)',
-  dark: 'var(--color-dark)',
-
-  // Add night-mode-capable colors
-  gray: buildNightModeCapable('gray'),
-  red: buildNightModeCapable('red'),
-  orange: buildNightModeCapable('orange'),
-  green: buildNightModeCapable('green'),
-  blue: buildNightModeCapable('blue'),
-  brand: buildNightModeCapable('brand')
+  // Red
+  red: {
+    'primary-1': baseTheme('colors.red.500'),
+    'primary-2': baseTheme('colors.red.600'),
+    'primary-3': baseTheme('colors.red.700'),
+    'secondary-1': baseTheme('colors.red.100'),
+    'secondary-2': baseTheme('colors.red.200'),
+    'secondary-3': baseTheme('colors.red.300')
+  },
+  // Orange
+  orange: {
+    'primary-1': baseTheme('colors.orange.500'),
+    'primary-2': baseTheme('colors.orange.600'),
+    'primary-3': baseTheme('colors.orange.700'),
+    'secondary-1': baseTheme('colors.orange.100'),
+    'secondary-2': baseTheme('colors.orange.200'),
+    'secondary-3': baseTheme('colors.orange.300')
+  },
+  // Green
+  green: {
+    'primary-1': baseTheme('colors.green.500'),
+    'primary-2': baseTheme('colors.green.600'),
+    'primary-3': baseTheme('colors.green.700'),
+    'secondary-1': baseTheme('colors.green.100'),
+    'secondary-2': baseTheme('colors.green.200'),
+    'secondary-3': baseTheme('colors.green.300')
+  },
+  // Blue
+  blue: {
+    'primary-1': baseTheme('colors.blue.500'),
+    'primary-2': baseTheme('colors.blue.600'),
+    'primary-3': baseTheme('colors.blue.700'),
+    'secondary-1': baseTheme('colors.blue.100'),
+    'secondary-2': baseTheme('colors.blue.200'),
+    'secondary-3': baseTheme('colors.blue.300')
+  },
+  // Brand
+  brand: {
+    'primary-1': brandColors['500'],
+    'primary-2': brandColors['600'],
+    'primary-3': brandColors['700'],
+    'secondary-1': brandColors['100'],
+    'secondary-2': brandColors['200'],
+    'secondary-3': brandColors['300']
+  }
 }
 
 module.exports = {

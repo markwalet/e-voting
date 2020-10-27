@@ -63,4 +63,4 @@ plugins.push(
 )
 
 // Apply plugins
-mix.webpackConfig({ plugins })
+// mix.webpackConfig({ plugins })
