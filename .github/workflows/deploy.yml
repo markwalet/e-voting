@@ -33,12 +33,6 @@ jobs:
 
       - name: Build Front-end
         run: yarn build
-
-      - name: Publish front-end
-        uses: actions/upload-artifact@master
-        with:
-          name: front-end
-          path: public/
   laravel-backend:
     name: "Back-end build and test"
     runs-on: 'ubuntu-latest'
@@ -83,14 +77,10 @@ jobs:
             composer-build-${{ env.cache-name }}-
             composer-build-
 
-      - name: Cache node_modules
-        uses: actions/cache@v1
-        with:
-          path: node_modules
-          key: node-build-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            node-build-${{ env.cache-name }}-
-            node-build-
+      - name: Extract dummy front-end
+        run: |
+          cd public
+          unzip ../.github/public.zip
 
       - name: Copy environment config
         run: cp .github/actions.env .env
@@ -110,12 +100,6 @@ jobs:
 
       - name: Prepare database
         run: php artisan migrate --seed
-
-      - name: Download front-end
-        uses: actions/download-artifact@master
-        with:
-          name: front-end
-          path: public/
 
       - name: Run linters
         run: composer run lint
