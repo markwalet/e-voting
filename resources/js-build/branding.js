@@ -5,18 +5,6 @@
 // Get default theme
 const defaultTheme = require('tailwindcss/defaultTheme')
 
-// Shorthand some colors
-const buildNightModeCapable = (color) => {
-  return {
-    'primary-1': `var(--color-${color}-primary-1)`,
-    'primary-2': `var(--color-${color}-primary-2)`,
-    'primary-3': `var(--color-${color}-primary-3)`,
-    'secondary-1': `var(--color-${color}-secondary-1)`,
-    'secondary-2': `var(--color-${color}-secondary-2)`,
-    'secondary-3': `var(--color-${color}-secondary-3)`
-  }
-}
-
 const grayColors = {
   50: '#fafafa',
   100: '#f5f5f5',
@@ -43,37 +31,45 @@ const brandColors = {
   900: '#003900'
 }
 
+const baseTheme = key => {
+  // Get data
+  let out = defaultTheme
+
+  // Iterate over dots
+  for (let item of key.split('.')) {
+    // Get item
+    item = String(item)
+
+    // Fail if missing
+    if (!out.hasOwnProperty(item)) {
+      console.warn('Failed for %o at %o in %o', key, item, out)
+      return null
+    }
+
+    // Descend
+    out = out[item]
+  }
+
+  // Return result
+  return out
+}
+
 const colors = {
-  source: {
-    // Default colors
-    red: defaultTheme.colors.red,
-    orange: defaultTheme.colors.orange,
-    green: defaultTheme.colors.green,
-    blue: defaultTheme.colors.blue,
+  light: defaultTheme.colors.white,
+  dark: grayColors['900'],
 
-    // Our colors
-    gray: grayColors,
-    brand: brandColors
-  },
-
-  // Disable some colors
-  yellow: {},
-  teal: {},
-  indigo: {},
-  purple: {},
-  pink: {},
-
-  // Add night-mode-capable primaries
-  light: 'var(--color-light)',
-  dark: 'var(--color-dark)',
-
-  // Add night-mode-capable colors
-  gray: buildNightModeCapable('gray'),
-  red: buildNightModeCapable('red'),
-  orange: buildNightModeCapable('orange'),
-  green: buildNightModeCapable('green'),
-  blue: buildNightModeCapable('blue'),
-  brand: buildNightModeCapable('brand')
+  // Gray
+  gray: grayColors,
+  // Red
+  red: baseTheme('colors.red'),
+  // Orange
+  orange: baseTheme('colors.orange'),
+  // Green
+  green: baseTheme('colors.green'),
+  // Blue
+  blue: baseTheme('colors.blue'),
+  // Brand
+  brand: brandColors
 }
 
 module.exports = {

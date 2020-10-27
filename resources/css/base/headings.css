@@ -21,6 +21,6 @@
 
 .heading-4 {
   @apply my-2;
-  @apply text-brand-primary-2;
+  @apply text-brand-600;
   @apply font-bold uppercase;
 }

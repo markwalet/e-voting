@@ -1,0 +1,12 @@
+/*
+    Get the container in
+*/
+.container {
+    @apply px-4;
+}
+
+@screen sm {
+    .container {
+        max-width: theme('screens.sm');
+    }
+}

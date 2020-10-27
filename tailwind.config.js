@@ -10,6 +10,7 @@ const defaultTheme = require('tailwindcss/defaultTheme')
 module.exports = {
   plugins: gumboSettings.plugins,
   purge: {
+    mode: 'layers',
     content: [
       'app/**/*.php',
       'config/**/*.php',
@@ -19,9 +20,6 @@ module.exports = {
     ]
   },
   theme: {
-    container: {
-      center: true
-    },
     extend: {
       screens: {
         sm: '640px',
@@ -42,7 +40,7 @@ module.exports = {
         16: '4rem'
       },
       fontFamily: {
-        title: ['Poppins'].concat(defaultTheme.fontFamily.sans)
+        title: ['Poppins', ...defaultTheme.fontFamily.sans]
       },
       fontSize: {
         huge: '8rem'
@@ -93,7 +91,6 @@ module.exports = {
     }
   },
   variants: {
-    accessibility: ['focus'],
     alignContent: [],
     alignItems: ['responsive'],
     alignSelf: [],
@@ -161,10 +158,16 @@ module.exports = {
     zIndex: []
   },
   corePlugins: {
+    accessibility: false,
     backgroundOpacity: false,
-    textOpacity: false,
     borderOpacity: false,
+    container: false,
+    divideOpacity: false,
+    float: false,
     placeholderOpacity: false,
-    divideOpacity: false
+    textOpacity: false,
+    userSelect: false,
+    whitespace: false,
+    zIndex: false
   }
 }
