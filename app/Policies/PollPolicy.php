@@ -71,6 +71,13 @@ class PollPolicy
         return $poll->is_open;
     }
 
+    public function voteSelf(User $user, Poll $poll): bool
+    {
+        if (!$user->is_voter) {
+            return false;
+        }
+    }
+
     /**
      * Determine whether the user can create models.
      * @param  \App\Models\User  $user

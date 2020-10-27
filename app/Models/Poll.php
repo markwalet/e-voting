@@ -58,4 +58,15 @@ class Poll extends Model
         // All good :)
         return true;
     }
+
+    public function getStatusAttribute(): string
+    {
+        if ($this->ended_at !== null) {
+            return 'Gesloten';
+        }
+        if ($this->started_at !== null) {
+            return 'Open';
+        }
+        return 'Concept';
+    }
 }

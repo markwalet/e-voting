@@ -133,8 +133,7 @@ class LoginController extends Controller
         // Validate the token
         if (!$user->totp->verify($token)) {
             return \response()
-                ->redirectToRoute('login')
-                ->withInput()
+                ->redirectToRoute('login.verify')
                 ->with('message', 'De opgegeven code is onjuist');
         }
 

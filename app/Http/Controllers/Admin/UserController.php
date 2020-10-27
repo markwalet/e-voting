@@ -18,7 +18,7 @@ class UserController extends AdminController
     public function index(Request $request)
     {
         // Get only param
-        $only = $request->get('only');
+        $only = $request->get('filter');
 
         // Get users
         $query = User::query()
@@ -30,13 +30,30 @@ class UserController extends AdminController
         } elseif ($only === 'is-proxy') {
             $query->has('proxyFor');
         } elseif ($only === 'present') {
-            $query->where('is_present', '1');
+            $query->where('is_present', true);
+        } elseif ($only !== 'all') {
+            $query->hasVoteRights();
         }
+
+        // Count
+        $present = User::where([
+            'is_present' => true,
+            'is_voter' => true
+        ])->count();
+        $proxied = User::query()
+            ->where('is_present', true)
+            ->where(static fn ($query) =>
+                $query->where('is_voter', true)
+                    ->orWhere('can_proxy', true))
+            ->whereHas('proxyFor')
+            ->count();
 
         // Get response
         return \response()
             ->view('admin.users.list', [
-                'users' => $query->paginate(50)
+                'users' => $query->paginate(250),
+                'present' => $present,
+                'proxied' => $proxied,
             ]);
     }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -138,5 +139,18 @@ class User extends Authenticatable
         }
 
         return implode(', ', $rights) ?: '–';
+    }
+
+    public function scopeHasVoteRights(Builder $query): Builder
+    {
+        // phpcs:disable SlevomatCodingStandard.Functions.RequireArrowFunction.RequiredArrowFunction
+        return $query->where(static function ($query) {
+            $query->where('is_voter', '1')
+                ->orWhere(static function ($query) {
+                    return $query->has('proxyFor')
+                        ->where('can_proxy', '1');
+                });
+        });
+        // phpcs:enable
     }
 }

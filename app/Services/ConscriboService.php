@@ -138,6 +138,7 @@ final class ConscriboService
         $headers = $this->buildHeaders(null);
 
         $response = Http::withHeaders($headers)
+            ->withoutVerifying()
             ->withBody($body, 'application/json')
             ->post($this->endpoint);
 
@@ -177,6 +178,7 @@ final class ConscriboService
 
         // Send request
         $response = Http::withHeaders($headers)
+            ->withoutVerifying()
             ->withBody($body, 'application/json')
             ->post($this->endpoint);
 

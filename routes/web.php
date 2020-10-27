@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\PollController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\LogoutController;
+use App\Http\Controllers\VoteController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Homepage
-Route::get('/', static fn () => view('welcome'));
+Route::get('/', [VoteController::class, 'index'])->name('home');
 
 // Logout
 Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
@@ -47,8 +47,11 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(static functi
         Route::post('/create', [PollController::class, 'store'])->name('polls.create');
 
         // Start and stop
-        Route::post('/{poll}/start', [PollController::class, 'start'])->name('polls.start');
-        Route::post('/{poll}/stop', [PollController::class, 'stop'])->name('polls.stop');
+        Route::post('/{poll}/open', [PollController::class, 'open'])->name('polls.open');
+        Route::post('/{poll}/close', [PollController::class, 'close'])->name('polls.close');
+
+        // Delete concepts
+        Route::post('/{poll}/delete', [PollController::class, 'delete'])->name('polls.delete');
     });
 
     // Manage users

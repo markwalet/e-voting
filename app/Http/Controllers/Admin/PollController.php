@@ -6,7 +6,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Poll;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Date;
 
 class PollController extends AdminController
 {
@@ -17,12 +16,28 @@ class PollController extends AdminController
      */
     public function index(Request $request)
     {
-        // Get a query
-        $query = Poll::query();
+        // Get only param
+        $only = $request->get('only');
 
-        // Hide closed for more than a day by default
-        if (!$request->get('all')) {
-            $query->where('ended_at', '>', Date::now()->subDay());
+        // Get users
+        $query = Poll::query()
+            ->orderByDesc('ended_at')
+            ->orderByDesc('started_at')
+            ->orderBy('id');
+
+        // Add filters
+        if ($only === 'concept') {
+            $query
+                ->whereNull('started_at')
+                ->whereNull('ended_at');
+        } elseif ($only === 'opened') {
+            $query
+                ->whereNotNull('started_at')
+                ->whereNull('ended_at');
+        } elseif ($only === 'closed') {
+            $query
+                ->whereNotNull('started_at')
+                ->whereNotNull('ended_at');
         }
 
         // Prep list
@@ -56,8 +71,12 @@ class PollController extends AdminController
         // Make it
         Poll::create($valid);
 
+        // Set
+        $this->sendNotice('De nieuwe peiling is aangemaakt.');
+
         // Return
-        return \response()->back();
+        return \redirect()
+            ->back();
     }
 
     /**

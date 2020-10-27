@@ -1,42 +1,21 @@
 /* Notices */
 
 .notice {
-  @apply my-4 p-4 mb-4 border border-gray-500 rounded flex flex-row items-center;
+    @apply p-4 mb-4 border border-gray-600 rounded;
 }
 
-.notice__icon {
-  @apply mr-2 icon-lg border-gray-500;
-}
-
-.notice--large {
-  @apply flex-col items-start;
-}
-
-.notice--large .notice__title {
-  @apply mb-2;
-  @apply text-sm font-bold uppercase text-gray-600;
-}
-
-.notice--brand {
-  @apply border-brand-500;
+.notice--danger {
+    @apply bg-red-100 border-red-600 text-red-600;
 }
 
 .notice--warning {
-  @apply border-orange-500;
+    @apply bg-yellow-100 border-yellow-600 text-yellow-600;
 }
 
 .notice--info {
-  @apply border-blue-500;
+    @apply bg-blue-100 border-blue-600 text-blue-600;
 }
 
-.notice--brand .notice__icon, .notice--brand.notice--large .notice__title {
-  @apply text-brand-500;
-}
-
-.notice--warning .notice__icon, .notice--warning.notice--large .notice__title {
-  @apply text-orange-500;
-}
-
-.notice--info .notice__icon, .notice--info.notice--large .notice__title {
-  @apply text-blue-500;
+.notice__title {
+    @apply block text-sm uppercase mb-2;
 }
