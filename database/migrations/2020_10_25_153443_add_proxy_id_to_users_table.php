@@ -15,7 +15,7 @@ class AddProxyIdToUsersTable extends Migration
     public function up()
     {
         Schema::table('users', static function (Blueprint $table) {
-            $table->foreignId('proxy_id')->constrained('users')->nullable()->default(null);
+            $table->foreignId('proxy_id')->nullable()->default(null)->constrained('users');
         });
     }
 
@@ -26,7 +26,7 @@ class AddProxyIdToUsersTable extends Migration
     public function down()
     {
         Schema::table('users', static function (Blueprint $table) {
-            $table->dropColumn('proxy_id');
+            $table->dropConstrainedForeignId('proxy_id');
         });
     }
 }

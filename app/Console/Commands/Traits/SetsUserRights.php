@@ -135,10 +135,10 @@ trait SetsUserRights
         }
 
         // Remove foreign proxy if not authorized
-        if (!$user->can_proxy || $user->proxyFor !== null) {
+        if (!$user->can_proxy && $user->proxyFor !== null) {
             // Remove relation
             $proxy = $user->proxyFor;
-            $proxy->proxy()->dissociate();
+            $proxy->proxy_id = null;
             $proxy->save();
 
             // Unbind on model

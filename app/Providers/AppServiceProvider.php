@@ -20,6 +20,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        // Service that connects to conscribo
         $this->app->singleton(ConscriboService::class, static fn () => ConscriboService::fromConfig());
 
         // Service that sends notifications
