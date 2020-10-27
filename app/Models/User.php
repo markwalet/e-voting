@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -73,6 +74,7 @@ class User extends Authenticatable
         'is_voter' => 'bool',
         'is_admin' => 'bool',
         'is_monitor' => 'bool',
+        'is_present' => 'bool',
         'conscribo_id' => 'int'
     ];
 
@@ -109,11 +111,11 @@ class User extends Authenticatable
     }
 
     /**
-     * Returns true if this user has transferred his vote rights.
-     * @return bool
+     * Returns all votes the user has cast
+     * @return HasMany
      */
-    public function getIsTransferredProperty(): bool
+    public function votes(): HasMany
     {
-        return $this->proxy_id !== null;
+        return $this->hasMany(UserVote::class);
     }
 }

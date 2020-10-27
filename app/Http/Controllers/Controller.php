@@ -14,4 +14,16 @@ class Controller extends BaseController
     use AuthorizesRequests;
     use DispatchesJobs;
     use ValidatesRequests;
+
+    /**
+     * Flashes a message, allows arguments just like sprintf
+     * @param string $notice
+     * @param scalar|null $args
+     * @return void
+     */
+    protected function sendNotice(string $notice, ...$args): void
+    {
+        // Flashes the given message in the right key
+        \request()->flash('message', sprintf($notice, ...$args));
+    }
 }

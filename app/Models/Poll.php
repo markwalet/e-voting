@@ -21,6 +21,14 @@ class Poll extends Model
     ];
 
     /**
+     * The attributes that are mass assignable.
+     * @var array<string>
+     */
+    protected $fillable = [
+        'title'
+    ];
+
+    /**
      * Associated poll
      * @return HasMany<PollVote>
      */
@@ -49,10 +57,5 @@ class Poll extends Model
 
         // All good :)
         return true;
-    }
-
-    public function computeResults(): array
-    {
-        # code...
     }
 }
