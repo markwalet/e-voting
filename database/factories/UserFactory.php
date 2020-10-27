@@ -26,7 +26,7 @@ class UserFactory extends Factory
             'name' => $this->faker->name,
             'conscribo_id' => $this->faker->numberBetween(80_000, 90_000),
             'email' => $this->faker->unique()->safeEmail,
-            'phone' => $this->faker->e164PhoneNumber,
+            'phone' => $this->faker->numerify('06 ### ## ###'),
             'email_verified_at' => now(),
             'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
             'remember_token' => Str::random(10),

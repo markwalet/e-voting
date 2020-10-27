@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Contracts\SendsNotifications;
 use App\Models\User;
 use App\Services\Traits\ValidatesPhoneNumbers;
+use Illuminate\Support\Facades\Log;
 use OTPHP\TOTPInterface;
 
 /**
@@ -75,6 +76,10 @@ final class VerificationService
         // Verify phone number
         $phone = $this->formatPhoneNumber($user->phone);
         if (empty($phone)) {
+            // Log
+            Log::info('Phone number for {user} is missing!', compact('user'));
+
+            // Fail
             return false;
         }
 
@@ -84,6 +89,10 @@ final class VerificationService
 
         // Fail if missing params
         if (!$totp) {
+            // Log
+            Log::warn('TOTP for {user} is missing!', compact('user'));
+
+            // Fail
             return false;
         }
 
@@ -98,6 +107,10 @@ final class VerificationService
             $tokenInParts
         );
 
+        // Log
+        Log::info('Sending message {message} to {phone}', compact('message', 'phone'));
+
+        // Keep track
         $ok = false;
 
         // Send via each service that allows it
