@@ -1,12 +1,20 @@
 /*
     Get the container in
 */
+
 .container {
     @apply px-4;
 }
 
 @screen sm {
     .container {
+        @apply mx-auto;
         max-width: theme('screens.sm');
+    }
+}
+
+@screen md {
+    .container--md {
+        max-width: calc(theme('screens.md') - theme('spacing.16'));
     }
 }

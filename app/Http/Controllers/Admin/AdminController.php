@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Controller as BaseController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
-class AdminController extends Controller
+class AdminController extends BaseController
 {
     /**
      * Ensure safety
@@ -14,6 +16,6 @@ class AdminController extends Controller
      */
     public function __construct()
     {
-        $this->middleware(['auth', 'can:admin', 'private']);
+        $this->middleware('admin');
     }
 }

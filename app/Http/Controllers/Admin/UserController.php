@@ -15,7 +15,7 @@ class UserController extends AdminController
      * @param Request $request
      * @return Response
      */
-    public function list(Request $request)
+    public function index(Request $request)
     {
         // Get only param
         $only = $request->get('only');

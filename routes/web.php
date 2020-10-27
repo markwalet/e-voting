@@ -34,35 +34,32 @@ Route::post('/login/verify', [LoginController::class, 'verify']);
 Route::post('/login/retry', [LoginController::class, 'retry'])->name('login.retry');
 
 // Admin routes
-Route::middleware(['admin', 'can:admin', 'private'])
-    ->prefix('admin')
-    ->name('admin.')
-    ->group(static function () {
-        // Home route
-        Route::get('/', [AdminController::class, 'index'])->name('home');
+Route::middleware('admin')->prefix('admin')->name('admin.')->group(static function () {
+    // Home route
+    Route::view('/', 'admin.index')->name('home');
 
-        // Manage polls
-        Route::prefix('polls')->group(static function () {
-            // List
-            Route::get('/', [PollController::class, 'index'])->name('polls.index');
+    // Manage polls
+    Route::prefix('polls')->group(static function () {
+        // List
+        Route::get('/', [PollController::class, 'index'])->name('polls.index');
 
-            // Add
-            Route::post('/create', [PollController::class, 'store'])->name('polls.create');
+        // Add
+        Route::post('/create', [PollController::class, 'store'])->name('polls.create');
 
-            // Start and stop
-            Route::post('/{poll}/start', [PollController::class, 'start'])->name('polls.start');
-            Route::post('/{poll}/stop', [PollController::class, 'stop'])->name('polls.stop');
-        });
-
-        // Manage users
-        Route::prefix('users')->group(static function () {
-            // List
-            Route::get('/', [UserController::class, 'index'])->name('users.index');
-            Route::get('/{user}', [UserController::class, 'show'])->name('users.show');
-
-            // Presence, Proxy and Monitor
-            Route::post('/{user}/mark-present', [UserController::class, 'markPresent'])->name('users.present');
-            Route::post('/{user}/proxy', [UserController::class, 'setProxy'])->name('users.proxy');
-            Route::post('/{user}/monitor', [UserController::class, 'setMonitor'])->name('users.monitor');
-        });
+        // Start and stop
+        Route::post('/{poll}/start', [PollController::class, 'start'])->name('polls.start');
+        Route::post('/{poll}/stop', [PollController::class, 'stop'])->name('polls.stop');
     });
+
+    // Manage users
+    Route::prefix('users')->group(static function () {
+        // List
+        Route::get('/', [UserController::class, 'index'])->name('users.index');
+        Route::get('/{user}', [UserController::class, 'show'])->name('users.show');
+
+        // Presence, Proxy and Monitor
+        Route::post('/{user}/mark-present', [UserController::class, 'markPresent'])->name('users.present');
+        Route::post('/{user}/proxy', [UserController::class, 'setProxy'])->name('users.proxy');
+        Route::post('/{user}/monitor', [UserController::class, 'setMonitor'])->name('users.monitor');
+    });
+});

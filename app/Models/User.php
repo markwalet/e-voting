@@ -128,13 +128,13 @@ class User extends Authenticatable
     {
         $rights = [];
         if ($this->is_voter) {
-            $rights[] = 'Stemmen';
+            $rights[] = 'S';
         }
         if ($this->can_proxy) {
-            $rights[] = 'Machtingen';
+            $rights[] = 'M';
         }
         if ($this->is_admin) {
-            $rights[] = 'Admin';
+            $rights[] = 'A';
         }
 
         return implode(', ', $rights) ?: '–';

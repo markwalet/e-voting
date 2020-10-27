@@ -1,0 +1,10 @@
+.header {
+    @apply my-4 flex flex-col items-center;
+    @apply pb-4 border-b border-gray-300;
+}
+
+@screen sm {
+    .header {
+        @apply flex-row;
+    }
+}
