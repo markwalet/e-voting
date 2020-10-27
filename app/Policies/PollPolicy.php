@@ -71,6 +71,7 @@ class PollPolicy
         return $poll->is_open;
     }
 
+    // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
     public function voteSelf(User $user, Poll $poll): bool
     {
         if (!$user->is_voter) {
