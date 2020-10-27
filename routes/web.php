@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\PollController;
-use App\Http\Controllers\Admin\ProxyController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\LoginController;
 use Illuminate\Support\Facades\Route;
@@ -55,19 +54,11 @@ Route::middleware(['admin', 'can:admin', 'private'])
         Route::prefix('users')->group(static function () {
             // List
             Route::get('/', [UserController::class, 'index'])->name('users.index');
+            Route::get('/{user}', [UserController::class, 'show'])->name('users.show');
 
-            // Add
-            Route::get('/present', [UserController::class, 'markPresent'])->name('users.mark-present');
-            Route::post('/absent', [UserController::class, 'markAbsent'])->name('users.mark-absent');
-        });
-
-        // Manage users
-        Route::prefix('proxies')->group(static function () {
-            // List
-            Route::get('/', [ProxyController::class, 'index'])->name('auths.index');
-
-            // Add
-            Route::get('/remove', [ProxyController::class, 'remove'])->name('auths.remove');
-            Route::post('/add', [ProxyController::class, 'add'])->name('auths.add');
+            // Presence, Proxy and Monitor
+            Route::post('/{user}/mark-present', [UserController::class, 'markPresent'])->name('users.present');
+            Route::post('/{user}/proxy', [UserController::class, 'setProxy'])->name('users.proxy');
+            Route::post('/{user}/monitor', [UserController::class, 'setMonitor'])->name('users.monitor');
         });
     });

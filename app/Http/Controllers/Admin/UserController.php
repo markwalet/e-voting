@@ -10,6 +10,11 @@ use Illuminate\Validation\Rule;
 
 class UserController extends AdminController
 {
+    /**
+     * Lists a filterable set of users
+     * @param Request $request
+     * @return Response
+     */
     public function list(Request $request)
     {
         // Get only param
