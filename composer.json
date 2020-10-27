@@ -69,7 +69,7 @@
         "lint": [
             "Composer\\Config::disableProcessTimeout",
             "parallel-lint --blame app bootstrap config database public resources routes tests",
-            "phpcs || true"
+            "phpcs"
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
