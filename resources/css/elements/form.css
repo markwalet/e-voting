@@ -1,0 +1,14 @@
+.form-field {
+    @apply flex flex-col items-stretch;
+    @apply mb-4;
+}
+
+.form-field__label {
+    @apply mb-4 block text-sm text-gray-700;
+}
+
+.form-field__label--required::after {
+    @apply ml-2 inline-block;
+    @apply text-red-700;
+    content: '*';
+}

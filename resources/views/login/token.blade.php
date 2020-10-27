@@ -11,8 +11,16 @@
 
 <form action="{{ route('login.verify') }}" method="post">
     @csrf
-    <label for="token">Toegangscode</label>
-    <input value="{{ old('email') }}" type="text" pattern="[0-9]{8}" class="rounded border-gray-700 p-2" name="token" id="token" />
+    {{-- Token --}}
+    <div class="form-field">
+        <label for="token" class="form-field__label">Toegangscode</label>
+        <input type="text" pattern="[0-9]{8}" class="form-field__input form-input" name="token" id="token" />
+    </div>
+
+    {{-- Submit --}}
+    <div class="form-field">
+        <button class="btn btn--brand">Versturen</button>
+    </div>
 </form>
 
 <form action="{{ route('login.retry') }}" method="post" id="resend-form">@csrf</form>

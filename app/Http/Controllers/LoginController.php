@@ -6,10 +6,12 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Services\VerificationService;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class LoginController extends Controller
@@ -60,18 +62,20 @@ class LoginController extends Controller
 
         // Check if a user was found
         if (!$user) {
+            $this->sendNotice('Deze gebruiker kon niet worden gevonden');
+
             return \response()
                 ->redirectToRoute('login')
-                ->withInput()
-                ->with('message', 'Deze gebruiker kon niet worden gevonden');
+                ->withInput();
         }
 
         // Check the user
         if (empty($user->phone)) {
+            $this->sendNotice('Van deze gebruiker is geen telefoonnummer bekend, je kan dus niet inloggen');
+
             return \response()
                 ->redirectToRoute('login')
-                ->withInput()
-                ->with('message', 'Van deze gebruiker is geen telefoonnummer bekend. Je kan dus niet inloggen');
+                ->withInput();
         }
 
         // Assign user to session
@@ -81,9 +85,7 @@ class LoginController extends Controller
         ]);
 
         // Send the text
-        $ok = $service->sendMessage($user);
-        $message = $ok ? sprintf(self::SEND_MESSAGE, substr($user->phone, -2)) : self::RESEND_MESSAGE;
-        $request->session()->put('message', $message);
+        $this->sendCode($service, $user);
 
         // Forward
             return \response()
@@ -144,6 +146,9 @@ class LoginController extends Controller
         // Refresh the session ID
         $request->session()->regenerate();
 
+        // Done
+        $this->sendNotice('Je bent nu ingelogd.');
+
         // Redirect
         return \response()
             ->redirectTo('/');
@@ -167,9 +172,7 @@ class LoginController extends Controller
         }
 
         // Re-send the text
-        $ok = $service->sendMessage($user);
-        $message = $ok ? sprintf(self::SEND_MESSAGE, substr($user->phone, -2)) : self::RESEND_MESSAGE;
-        $request->session()->put('message', $message);
+        $this->sendCode($service, $user);
 
         // Forward
         return \response()
@@ -198,5 +201,18 @@ class LoginController extends Controller
         }
 
         return $user;
+    }
+
+    /**
+     * Re-sends the code if allowed
+     * @param VerificationService $service
+     * @param User $user
+     * @return void
+     */
+    private function sendCode(VerificationService $service, User $user): void
+    {
+        $ok = $service->sendMessage($user);
+        $message = $ok ? sprintf(self::SEND_MESSAGE, substr($user->phone, -2)) : self::RESEND_MESSAGE;
+        $this->sendNotice($message);
     }
 }
