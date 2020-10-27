@@ -74,7 +74,10 @@ class UserSeeder extends Seeder
             // Find user or create one
             $user = User::where('email', $email)->first();
             if (!$user) {
-                $user = User::factory()->makeOne($data);
+                $user = User::factory()->makeOne(array_merge(
+                    compact('email'),
+                    $data
+                ));
             }
 
             // Seed some data
