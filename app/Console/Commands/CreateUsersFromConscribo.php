@@ -7,14 +7,13 @@ namespace App\Console\Commands;
 use App\Console\Commands\Traits\SetsUserRights;
 use App\Models\User;
 use App\Services\ConscriboService;
-use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CreateUsersFromConscribo extends Command
+class CreateUsersFromConscribo extends ProductionCommand
 {
     use SetsUserRights;
 

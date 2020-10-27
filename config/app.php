@@ -45,6 +45,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Application Beta Mode
+    |--------------------------------------------------------------------------
+    |
+    | When the application is in beta mode, the Conscribo API will not be
+    | available and texts to paid provider will not be sent.
+    |
+    */
+
+    'beta' => (bool) env('APP_BETA', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application URL
     |--------------------------------------------------------------------------
     |

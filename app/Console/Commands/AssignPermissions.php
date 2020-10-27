@@ -7,10 +7,9 @@ namespace App\Console\Commands;
 use App\Console\Commands\Traits\SetsUserRights;
 use App\Models\User;
 use App\Services\ConscriboService;
-use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
-class AssignPermissions extends Command
+class AssignPermissions extends ProductionCommand
 {
     use SetsUserRights;
 

@@ -21,7 +21,9 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         // Service that connects to conscribo
-        $this->app->singleton(ConscriboService::class, static fn () => ConscriboService::fromConfig());
+        if (Config::get('app.beta') !== true) {
+            $this->app->singleton(ConscriboService::class, static fn () => ConscriboService::fromConfig());
+        }
 
         // Service that sends notifications
         $this->app->singleton(VerificationService::class, static function () {
@@ -29,12 +31,12 @@ class AppServiceProvider extends ServiceProvider
             $services = [];
 
             // Add flash if not in prod
-            if (App::environment('local')) {
+            if (App::environment('local') || Config::get('app.beta')) {
                 $services[] = new FlashService();
             }
 
-            // Add messagebird if key is set
-            if (!empty(Config::get('services.messagebird.access_key'))) {
+            // Add messagebird if key is set and not in beta
+            if (Config::get('app.beta') !== true && !empty(Config::get('services.messagebird.access_key'))) {
                 $services[] = new MessageBirdService();
             }
 

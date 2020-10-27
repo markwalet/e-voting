@@ -11,6 +11,8 @@
     dat bekend is bij het bestuur.
 </p>
 
+@includeWhen(Config::get('app.beta'), 'partials.login-beta')
+
 <form action="{{ route('login') }}" method="post" class="my-4 flex flex-col items-stretch login__form">
     @csrf
     {{-- Email --}}
