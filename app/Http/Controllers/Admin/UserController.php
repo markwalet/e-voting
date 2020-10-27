@@ -110,6 +110,12 @@ class UserController extends AdminController
             return \redirect()->back();
         }
 
+        // Check if the user has rights to proxy
+        if (!$user->is_voter) {
+            $this->sendNotice('"%s" heeft geen stemrecht, er valt dus niets te machtigen.', $user->name);
+            return \redirect()->back();
+        }
+
         // Check if the user is not already authorized
         $proxyUser = User::find($valid['user_id']);
         if ($proxyUser === null) {
@@ -123,6 +129,12 @@ class UserController extends AdminController
             De gebruiker "%s" heeft al een machtiging afgegeven aan "%s".
             Machtigingen zijn niet stapelbaar.
             TXT, $proxyUser->name, $proxyUser->proxy->name);
+            return \redirect()->back();
+        }
+
+        // Check if the to-proxy user has rights to proxy
+        if (!$proxyUser->can_proxy) {
+            $this->sendNotice('"%s" mag geen machtigingen accepteren.', $proxyUser->name);
             return \redirect()->back();
         }
 

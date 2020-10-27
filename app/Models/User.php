@@ -75,6 +75,7 @@ class User extends Authenticatable
         'is_admin' => 'bool',
         'is_monitor' => 'bool',
         'is_present' => 'bool',
+        'can_proxy' => 'bool',
         'conscribo_id' => 'int'
     ];
 

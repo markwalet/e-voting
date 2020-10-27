@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Console\Commands\Traits\SetsUserRights;
 use App\Models\User;
 use App\Services\ConscriboService;
 use Illuminate\Console\Command;
@@ -15,16 +16,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class CreateUsersFromConscribo extends Command
 {
+    use SetsUserRights;
 
-    /**
-     * Groups that allow an account
-     */
-    private const CREATE_USER_GROUPS = ['lid', 'erelid', 'a-leden', 'oud-lid', 'begunstigers'];
-
-    /**
-     * Groups that allow is_vote to be true
-     */
-    private const ALLOW_VOTING_GROUPS = ['lid', 'erelid'];
     /**
      * The name and signature of the console command.
      * @var string
@@ -35,7 +28,7 @@ class CreateUsersFromConscribo extends Command
      * The console command description.
      * @var string
      */
-    protected $description = 'Creates users from Conscribo, that are likely to use this sytem. Updates `is_voter`';
+    protected $description = 'Creates users from Conscribo, that are likely to use this sytem.';
 
     /**
      * Execute the console command.
@@ -43,18 +36,13 @@ class CreateUsersFromConscribo extends Command
      */
     public function handle(ConscriboService $service)
     {
-        // Get roles
-        $this->line('Fetching roles...', null, OutputInterface::VERBOSITY_VERBOSE);
-        $roles = $this->getMappedGroupIds($service);
-        $this->info("Retrieved {$roles->count()} role(s)");
-
         // Get people
         $this->line('Fetching users...', null, OutputInterface::VERBOSITY_VERBOSE);
         $people = collect($service->getResource('persoon'));
         $this->info("Retrieved {$people->count()} user(s)");
 
         // Disable fill protections
-        $this->createOrUpdateUsersWithRoles($people, $roles);
+        $this->createOrUpdateUsersWithRoles($service, $people);
 
         // Assign admin roles
         $this->call('vote:assign-permissions', ['--admin']);
@@ -64,47 +52,19 @@ class CreateUsersFromConscribo extends Command
     }
 
     /**
-     * Maps all groups to a list of IDs, to allow quick role assignment
-     * @param ConscriboService $service
-     * @return Collection<array<int>>
-     */
-    public function getMappedGroupIds(ConscriboService $service): Collection
-    {
-        // Get groups
-        $groups = $service->getResourceGroups('persoon');
-
-        return collect($groups)
-            ->mapWithKeys(static fn ($group) => [Str::slug($group['name']) => $group['members']]);
-    }
-
-    /**
      * Update or create users
      * @param Collection<array> $users
      * @param Collection<array<int>> $roles
      * @return void
      */
-    public function createOrUpdateUsersWithRoles(Collection $users, Collection $roles): void
+    public function createOrUpdateUsersWithRoles(ConscriboService $service, Collection $users): void
     {
-
         User::unguard();
 
         // Prep counts
         $parseCount = 0;
         $newCount = 0;
         $totalCount = $users->count();
-
-        /**
-         * Checks if a user ID is present in the list of groups
-         * @return bool
-         */
-        $inGroup = static function (int $userId, array $groups) use ($roles) {
-            foreach ($groups as $wanted) {
-                if (isset($roles[$wanted]) && \in_array($userId, $roles[$wanted])) {
-                    return true;
-                }
-            }
-            return false;
-        };
 
         // Get all users
         foreach ($users as $userData) {
@@ -131,7 +91,7 @@ class CreateUsersFromConscribo extends Command
             }
 
             // Check if user should be created
-            if (!$inGroup($userId, self::CREATE_USER_GROUPS)) {
+            if (!$this->shouldCreateUser($service, $userId)) {
                 $this->comment("Ignoring {$userName}, no rights");
                 continue;
             }
@@ -151,9 +111,7 @@ class CreateUsersFromConscribo extends Command
             $user->email_verified_at = Date::now();
 
             // Update roles
-            $user->is_voter = $inGroup($userId, self::ALLOW_VOTING_GROUPS);
-            $judge = $user->is_voter ? 'allowed' : 'denied';
-            $this->line("User <info>$userName</> vote judgement: <comment>$judge</>.", null);
+            $this->setUserRights($service, $user);
 
             // Add phone if set
             if (!empty($userData['telefoonnummer'])) {
