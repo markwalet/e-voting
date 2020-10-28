@@ -99,7 +99,10 @@ jobs:
           done
 
       - name: Prepare database
-        run: php artisan migrate --seed
+        run: |
+          php artisan migrate
+          php artisan migrate:refresh
+          php artisan migrate --seed
 
       - name: Run linters
         run: composer run lint
