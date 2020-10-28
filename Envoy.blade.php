@@ -68,7 +68,6 @@ deployment_migrate
 deployment_cache
 deployment_up
 deployment_cleanup
-deployment_cron
 health_check
 @endstory
 
@@ -264,33 +263,6 @@ echo ">>URL = ${APP_URL}"
 @task('deployment_cleanup')
 find "$( dirname "{{ $deployPath }}" )" -maxdepth 1 -name "20*" | sort | head -n -4 | xargs rm -Rf
 echo "Cleaned up old deployments"
-@endtask
-
-@task('deployment_cron')
-echo "Checking for installed cronjob"
-ACTION_LINE="cd \"{{ $livePath }}\" && php artisan schedule:run"
-
-if ! crontab -l | grep -q -F "$ACTION_LINE"; then
-    echo "Building new cronjob list"
-    NEW_CRONTAB=<<<DOC
-    $( crontab -l )
-    * * * * * ${ACTION_LINE} >> /dev/null 2>&1
-    DOC
-
-    echo "Validating cronjob"
-    if crontab -T - <($NEW_CRONTAB); then
-        echo "Cron valid, installing"
-        crontab - <($NEW_CRONTAB);
-        echo "Cronjob installed"
-    else
-        echo "Cronjob invalid, printing below"
-        echo "==============================="
-        echo "$NEW_CRONTAB"
-        echo "==============================="
-    fi
-else
-    echo "Cron already installed"
-fi
 @endtask
 
 @story('rollback')
