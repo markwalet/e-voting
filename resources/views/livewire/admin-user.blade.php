@@ -3,7 +3,9 @@
     <td class="py-2">{{ $user->vote_label }}</td>
     <td class="py-2">
         {{ $user->is_present ? 'Ja' : 'Nee' }}
+        @can('setPresent', $user)
         <button class="appearance-none ml-2 text-yellow-600" wire:click.prevent="setPresent({{ !$user->is_present }})">⇄</button>
+        @endcan
     </td>
     @if ($user->proxyFor)
     <td class="py-2">

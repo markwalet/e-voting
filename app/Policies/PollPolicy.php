@@ -199,4 +199,96 @@ class PollPolicy
         // Only allow if not yet started
         return $poll->started_at === null && $poll->ended_at === null;
     }
+
+    /**
+     * Can the user make a judgement on the validity of this poll?
+     * @param User $user
+     * @param Poll $poll
+     * @return bool
+     */
+    public function approve(User $user, Poll $poll): bool
+    {
+        // Check if correct rights
+        if (!$user->can('monitor')) {
+            return false;
+        }
+
+        // Check poll state
+        if (
+            $poll->ended_at === null
+            || $poll->started_at === null
+            || $poll->ended_at >= Date::now()
+            || $poll->started_at >= Date::now()
+        ) {
+            return false;
+        }
+
+        // Check if not confirmed
+        if ($poll->confirmed_at !== null) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Can the user approve the poll, and actually submit one?
+     * @param User $user
+     * @param Poll $poll
+     * @return bool
+     */
+    public function submitApprove(User $user, Poll $poll): bool
+    {
+        // Is the user allowed
+        if (!$this->approve($user, $poll)) {
+            return false;
+        }
+
+        // Has the user not yet created
+        return !$poll->approvals()->where('user_id', $user->id)->exists();
+    }
+
+    /**
+     * Can the user complete the given poll
+     * @param User $user
+     * @param Poll $poll
+     * @return bool
+     */
+    public function complete(User $user, Poll $poll): bool
+    {
+        // Only allow admins
+        if (!$user->can('admin')) {
+            return false;
+        }
+
+        // Only allow if finished
+        if (
+            $poll->ended_at === null
+            || $poll->started_at === null
+            || $poll->ended_at >= Date::now()
+            || $poll->started_at >= Date::now()
+        ) {
+            return false;
+        }
+
+        // Only allow if not yet completed
+        if ($poll->completed_at !== null) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Can we actually complete this poll?
+     * @param User $user
+     * @param Poll $poll
+     * @return bool
+     */
+    public function submitComplete(User $user, Poll $poll): bool
+    {
+        return
+            $this->complete($user, $poll) &&
+            $poll->approvals()->count() >= 1;
+    }
 }

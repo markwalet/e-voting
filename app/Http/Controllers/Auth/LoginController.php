@@ -209,6 +209,12 @@ class LoginController extends Controller
      */
     private function sendCode(VerificationService $service, User $user): void
     {
+        // Generate a new TOTP if it's missing
+        if (!$user->totp) {
+            $user->generateTotp();
+            $user->save();
+        }
+
         $ok = $service->sendMessage($user);
         $message = $ok ? sprintf(self::SEND_MESSAGE, substr($user->phone, -2)) : self::RESEND_MESSAGE;
         $this->sendNotice($message);

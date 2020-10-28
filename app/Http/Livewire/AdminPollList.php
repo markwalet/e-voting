@@ -23,7 +23,8 @@ class AdminPollList extends Component
     public function getPollsProperty()
     {
         $query = Poll::query()
-            ->orderByDesc('id');
+            ->orderByDesc('id')
+            ->with('approvals');
 
         \assert($query instanceof Builder);
 

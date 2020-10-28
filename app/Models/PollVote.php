@@ -43,4 +43,9 @@ class PollVote extends Model
     {
         return $this->belongsTo(Poll::class);
     }
+
+    public function getVoteLabelAttribute(): string
+    {
+        return self::VALID_VOTES[$this->vote] ?? $this->vote;
+    }
 }

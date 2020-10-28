@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Casts\ArchivedResultsCast;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Date;
@@ -19,9 +20,9 @@ class Poll extends Model
         'started_at' => 'datetime',
         'ended_at' => 'datetime',
         'completed_at' => 'datetime',
-        'results' => 'json',
         'start_count' => 'int',
         'end_count' => 'int',
+        'results' => ArchivedResultsCast::class,
     ];
 
     /**
@@ -49,7 +50,7 @@ class Poll extends Model
     public function approvals(): HasMany
     {
         return $this->hasMany(PollApproval::class)
-            ->orderByAsc('created_at');
+            ->orderBy('created_at');
     }
 
     /**
@@ -76,6 +77,9 @@ class Poll extends Model
 
     public function getStatusAttribute(): string
     {
+        if ($this->completed_at !== null) {
+            return 'Afgerond';
+        }
         if ($this->ended_at !== null) {
             return 'Gesloten';
         }
@@ -91,6 +95,7 @@ class Poll extends Model
      */
     public function calculateResults(): ?PollResults
     {
+        // Skip if not yet finished
         if ($this->started_at === null ||  $this->ended_at === null) {
             return null;
         }
@@ -108,6 +113,66 @@ class Poll extends Model
             $results['favor'] ?? 0,
             $results['against'] ?? 0,
             $results['blank'] ?? 0,
+            $this->votes
         );
+    }
+
+    /**
+     * Returns the approval rate of this poll
+     * @return null|PollApprovalResults
+     */
+    public function calculateApproval(): ?PollApprovalResults
+    {
+        // Skip if not yet finished
+        if ($this->started_at === null ||  $this->ended_at === null) {
+            return null;
+        }
+
+        // Get votes
+        $results = $this->approvals()
+            ->reorder()
+            ->groupBy('result')
+            ->select('result', DB::raw('COUNT(*) as count'))
+            ->get()
+            ->pluck('count', 'result');
+
+        // Map to model
+        return new PollApprovalResults(
+            $results['pass'] ?? 0,
+            $results['reject'] ?? 0,
+            $results['neutral'] ?? 0,
+            $this->approvals
+        );
+    }
+
+    /**
+     * Check if the request was weird
+     * @return bool
+     */
+    public function getIsWeirdAttribute(): bool
+    {
+        // Check if still active
+        if ($this->started_at === null || $this->ended_at === null) {
+            return false;
+        }
+
+        // Load vote count
+        $this->loadCount('votes');
+
+        // Check some properties
+        if (
+            $this->start_count != $this->end_count ||
+            $this->votes_count > $this->start_count
+        ) {
+            return false;
+        }
+
+        // Check vote times
+        $firstVote = $this->votes()->oldest()->first();
+        $lastVote = $this->votes()->latest()->first();
+
+        // Warn if outside of window
+        return $firstVote->created_at < $this->started_at
+            || $lastVote->created_at >= $this->ended_at;
     }
 }

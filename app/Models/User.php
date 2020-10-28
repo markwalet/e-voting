@@ -102,6 +102,11 @@ class User extends Authenticatable
         'conscribo_id' => 'int'
     ];
 
+    public function getHasTotpAttribute(): bool
+    {
+        return !empty($this->totp_secret);
+    }
+
     /**
      * Returns verification instance
      * @return TOTPInterface

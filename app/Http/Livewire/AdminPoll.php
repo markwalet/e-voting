@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Livewire;
 
+use App\Models\ArchivedResults;
 use App\Models\Poll;
 use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -14,10 +15,16 @@ class AdminPoll extends Component
     use AuthorizesRequests;
 
     public Poll $poll;
+    public bool $showApprove = false;
 
     public function render()
     {
-        return view('livewire.admin-poll');
+        $data = [];
+        if ($this->showApprove) {
+            $data['results'] = $this->poll->calculateResults();
+            $data['judgement'] = $this->poll->calculateApproval();
+        }
+        return view('livewire.admin-poll', $data);
     }
     /**
      * Opens the poll
@@ -49,6 +56,24 @@ class AdminPoll extends Component
 
         // Save the new poll
         $this->poll->save();
+    }
+
+    public function confirm(): void
+    {
+        // Get shorthand
+        $poll = $this->poll;
+        // Check
+        $this->authorize('submitComplete', $poll);
+
+        // Stop the poll
+        $poll->completed_at = now();
+        $poll->results = ArchivedResults::create($poll);
+
+        // Save the new poll
+        $poll->save();
+
+        // Collapse
+        $this->showApprove = false;
     }
 
     /**

@@ -36,7 +36,7 @@
         {{-- User --}}
         <div class="text-right">
             @auth
-            Ingelogd als <strong>{{ request()->user()->name }}</strong><br />
+            Ingelogd als <strong>{{ Auth::user()->name }}</strong><br />
             @can('monitor')
             <a href="{{ route('monitor.index') }}">Controle</a>&nbsp;
             @endcan

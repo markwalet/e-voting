@@ -53,7 +53,7 @@ $facts = [
     <button class="btn btn--primary btn--narrow w-full text-center">Ontkoppelen</button>
     @endcan
 </form>
-@elseif (request()->user()->can('setProxy', [$user, null]))
+@elseif (Auth::user()->can('setProxy', [$user, null]))
 <form method="POST" action="{{ route('admin.users.proxy', compact('user')) }}" class="rounded shadow p-4">
     @csrf
     <input type="hidden" name="action" value="set">

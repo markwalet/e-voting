@@ -1,7 +1,7 @@
 @extends('layouts.base')
 
 @php
-$user = request()->user();
+$user = Auth::user();
 @endphp
 
 @section('content')

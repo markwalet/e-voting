@@ -4,7 +4,7 @@ $options = [
     'against' => 'Tegen',
     'blank' => 'Onthouding'
 ];
-$user = request()->user();
+$user = Auth::user();
 $proxy = $user->proxyFor;
 $voteUsers = [
     $user->can('vote', $poll)
