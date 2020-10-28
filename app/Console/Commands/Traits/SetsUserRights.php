@@ -31,6 +31,13 @@ trait SetsUserRights
     private static array $proxyGroups = ['lid', 'erelid', 'begunstiger'];
 
     /**
+     * Groups that are normally not allowed to vote, but are allowed
+     * if the user is in the admin group
+     * @var array
+     */
+    private static array $boardVoteGroups = ['oud-lid'];
+
+    /**
      * Codes of the group of which the members are admin
      * @var string
      */
@@ -128,6 +135,11 @@ trait SetsUserRights
         $user->is_voter = $this->existsInCollection($conscriboId, $groups, self::$voteGroups);
         $user->can_proxy = $this->existsInCollection($conscriboId, $groups, self::$proxyGroups);
         $user->is_admin = $admins->contains($conscriboId);
+
+        // Assign edge case for oud-lid being board members
+        if (!$user->is_voter && $user->is_admin) {
+            $user->is_voter = $this->existsInCollection($conscriboId, $groups, self::$boardVoteGroups);
+        }
 
         // Remove proxy if set and if not allowed to vote
         if (!$user->is_voter && $user->proxy) {
