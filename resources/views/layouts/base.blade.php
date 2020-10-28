@@ -52,16 +52,28 @@
     </header>
 
     <main class="container mx-auto">
+        {{-- Errors --}}
+        @if ($errors->any())
+        <div class="notice notice--danger my-4">
+            <p class="mb-4">Er is wat fout gegaan bij het versturen van de data:</p>
+            <ul>
+                @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
+
         {{-- Messages --}}
         @if (session()->has('message'))
-        <div class="rounded p-4 border border-yellow-600 my-4">
+        <div class="notice notice--warning my-4">
             <p>{{ session()->pull('message') }}</p>
         </div>
         @endif
 
         {{-- Debug messages --}}
         @if (Config::get('app.beta') && session()->has('debug-message'))
-        <div class="rounded p-4 border border-yellow-700 my-4">
+        <div class="notice notice--warning my-4">
             <strong class="text-yellow-700 font-bold block text-sm uppercase">Debug message</strong>
             <p>{{ session()->pull('debug-message') }}</p>
         </div>

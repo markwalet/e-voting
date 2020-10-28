@@ -13,8 +13,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class PollVote extends Model
 {
     public const VALID_VOTES = [
-        'against' => 'Tegen',
         'favor' => 'Voor',
+        'against' => 'Tegen',
         'blank' => 'Onthouding'
     ];
 

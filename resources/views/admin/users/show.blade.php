@@ -58,8 +58,8 @@ $facts = [
     @csrf
     <input type="hidden" name="action" value="set">
     <div class="flex flex-row items-center">
-        <label for="grant" class="mr-2 flex-none">Machtiging afgegeven aan:</label>
-        <select name="user_id" id="grant" class="w-1/2 flex-grow">
+        <label for="grant" class="mr-2 flex-none">Machtiging afgeven aan</label>
+        <select name="user_id" id="grant" class="w-1/2 flex-grow form-select">
             @foreach ($proxies as $id => $name)
                 <option value="{{ $id }}">{{ $name }}</option>
             @endforeach
@@ -69,26 +69,32 @@ $facts = [
     <button class="btn btn--primary btn--narrow w-full text-center">Koppelen</button>
 </form>
 @elseif ($user->is_voter)
-<div class="notice notice--warning">
+<div class="notice notice--info">
     Je kan momenteel niet de machtigingen aanpassen.
 </div>
 @else
-<div class="notice notice--warning">
+<div class="notice">
     Deze gebruiker kan geen machtiging afgeven
 </div>
 @endif
 
 <h2 class="font-title text-lg mb-2 mt-4">Instellen als telraad</h2>
 
-<form method="POST" action="{{ route('admin.users.proxy', compact('user')) }}" class="rounded shadow px-4">
+@can('setMonitor', $user)
+<form method="POST" action="{{ route('admin.users.monitor', compact('user')) }}" class="rounded shadow px-4">
     @csrf
     <div class="flex flex-row items-center">
         <p class="mr-4">
             {{ $user->name }} is momenteel {{ $user->is_monitor ? 'wel' : 'geen' }} lid van de telraad
         </p>
-        <button name="action" value="{{ $user->is_monitor ? 'unset' : 'set '}}" class="btn btn--brand btn--narrow">wisselen</button>
+        <button name="action" value="{{ $user->is_monitor ? 'unset' : 'set' }}" class="btn btn--brand btn--narrow">wisselen</button>
     </div>
 </form>
+@else
+<div class="notice">
+    Deze gebruiker kan niet lid worden van de telraad
+</div>
+@endcan
 
 <div class="my-4">
     <a href="{{ route('admin.users.index') }}" class="btn btn--brand btn--wide">Terug naar overzicht</a>

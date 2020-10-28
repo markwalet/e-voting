@@ -119,7 +119,7 @@ class UserController extends AdminController
     {
         // Validate request
         $valid = $request->validate([
-            'type' => ['required', Rule::in('unset', 'set')]
+            'action' => ['required', Rule::in('unset', 'set')]
         ]);
 
         // Check if possible
@@ -129,7 +129,7 @@ class UserController extends AdminController
         }
 
         // Update
-        $user->is_monitor = $valid['type'] === 'set';
+        $user->is_monitor = $valid['action'] === 'set' ? 1 : 0;
         $user->save();
 
         // Done

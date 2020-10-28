@@ -55,10 +55,22 @@ class PollPolicy
      */
     public function vote(User $user, Poll $poll, ?User $proxy = null): bool
     {
+        // Only if open
+        if (!$poll->is_open) {
+            return false;
+        }
+
+        // Only if user is marked as present
+        if (!$user->is_present) {
+            return false;
+        }
+
+        // Handle proxy
         if ($proxy) {
             return $this->voteProxy($user, $poll, $proxy);
         }
 
+        // Handle normal
         return $this->voteSelf($user, $poll);
     }
 
@@ -77,11 +89,6 @@ class PollPolicy
 
         // Reject if user is proxied
         if ($user->proxy_id !== null) {
-            return false;
-        }
-
-        // Only if open
-        if (!$poll->is_open) {
             return false;
         }
 
@@ -105,11 +112,6 @@ class PollPolicy
 
         // Only if proxy can vote
         if (!$proxy->is_voter) {
-            return false;
-        }
-
-        // Only if open
-        if (!$poll->is_open) {
             return false;
         }
 
