@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Admin\PollController;
 use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\LoginController;
-use App\Http\Controllers\LogoutController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\LogoutController;
+use App\Http\Controllers\MonitorController;
 use App\Http\Controllers\VoteController;
 use Illuminate\Support\Facades\Route;
 
@@ -36,7 +37,7 @@ Route::post('/login/retry', [LoginController::class, 'retry'])->name('login.retr
 // Admin routes
 Route::middleware('admin')->prefix('admin')->name('admin.')->group(static function () {
     // Home route
-    Route::view('/', 'admin.index')->name('home');
+    Route::view('/', 'admin.index')->name('index');
 
     // Manage polls
     Route::prefix('polls')->group(static function () {
@@ -65,4 +66,10 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(static functi
         Route::post('/{user}/proxy', [UserController::class, 'setProxy'])->name('users.proxy');
         Route::post('/{user}/monitor', [UserController::class, 'setMonitor'])->name('users.monitor');
     });
+});
+
+// Monitor routes
+Route::middleware('monitor')->prefix('monitor')->name('monitor.')->group(static function () {
+    // Home route
+    Route::get('/', [MonitorController::class, 'index'])->name('index');
 });

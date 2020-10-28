@@ -27,7 +27,14 @@ $user = request()->user();
 </div>
 @endcan
 
-{{-- Render the polls --}}
-@each('partials.poll', $polls, 'poll', 'partials.poll-empty')
+{{-- render polls --}}
+@forelse ($polls as $poll)
+<livewire:poll-vote-card :poll="$poll" />
+@empty
+<div class="notice notice--info">
+    Er zijn momenteel geen actieve stemmingen.
+</div>
+@endforelse
 
+{{-- done --}}
 @endsection

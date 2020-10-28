@@ -47,6 +47,11 @@ class Kernel extends HttpKernel
             'auth',
             'can:admin',
             'private'
+        ],
+        'monitor' => [
+            'auth',
+            'can:monitor',
+            'private'
         ]
     ];
 

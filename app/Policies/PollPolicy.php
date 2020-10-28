@@ -47,63 +47,138 @@ class PollPolicy
     }
 
     /**
-     * Determine whether the user can view the model.
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Poll  $poll
+     * Determine whether the user can, or could, vote for this poll
+     * @param User $user
+     * @param Poll $poll
+     * @param null|User $proxy User to vote for
      * @return bool
      */
     public function vote(User $user, Poll $poll, ?User $proxy = null): bool
     {
-        // Disallow if no vote right
-        if (!$user->is_voter) {
-            return false;
+        if ($proxy) {
+            return $this->voteProxy($user, $poll, $proxy);
         }
 
-        // Disallow if transferred, or if this is a transfer check
-        // and it's not transferred
-        if (
-            ($user->proxy !== null && !$proxy) ||
-            ($user->proxy === null && $proxy)
-        ) {
-            return false;
-        }
-
-        return $poll->is_open;
+        return $this->voteSelf($user, $poll);
     }
 
-    // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+    /**
+     * Returns true if $user can vote for itself
+     * @param User $user
+     * @param Poll $poll
+     * @return bool
+     */
     public function voteSelf(User $user, Poll $poll): bool
     {
+        // Only if voting is allowed
         if (!$user->is_voter) {
             return false;
         }
+
+        // Reject if user is proxied
+        if ($user->proxy_id !== null) {
+            return false;
+        }
+
+        // Only if open
+        if (!$poll->is_open) {
+            return false;
+        }
+
+        // Only if not yet voted
+        return true;
+    }
+
+    /**
+     * Returns true if $user can vote for an external user $proxy as it's proxy
+     * @param User $user
+     * @param Poll $poll
+     * @return bool
+     */
+    public function voteProxy(User $user, Poll $poll, User $proxy): bool
+    {
+        // Only if the user can proxy and is the proxy
+        if (!$user->can_proxy || !$user->proxyFor->is($proxy)) {
+            dump('user');
+            return false;
+        }
+
+        // Only if proxy can vote
+        if (!$proxy->is_voter) {
+            return false;
+        }
+
+        // Only if open
+        if (!$poll->is_open) {
+            return false;
+        }
+
+        // Only if not yet voted
+        return true;
+    }
+
+    /**
+     * Returns true if the user can still cast a vote
+     * @param User $user
+     * @param Poll $poll
+     * @param null|User $proxy
+     * @return bool
+     */
+    public function castVote(User $user, Poll $poll, ?User $proxy = null): bool
+    {
+        if (!$this->vote($user, $poll, $proxy)) {
+            dump('Pre-check failed');
+            return false;
+        }
+
+        $model = $proxy ? $proxy : $user;
+        return !$model->votes()->where('poll_id', $poll->id)->exists();
     }
 
     /**
      * Determine whether the user can create models.
-     * @param  \App\Models\User  $user
+     * @param User $user
      * @return mixed
      */
     public function create(User $user)
     {
-        return Gate::forUser($user)->allows('admin');
+        return $user->can('admin');
     }
 
     /**
-     * Determine whether the user can update the model.
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Poll  $poll
+     * Determine whether the user can open the poll
+     * @param User $user
+     * @param Poll $poll
      * @return mixed
      */
-    public function update(User $user, Poll $poll)
+    public function open(User $user, Poll $poll)
     {
         // Only allow admins
-        if (!Gate::forUser($user)->allows('admin')) {
+        if (!$user->can('admin')) {
             return false;
         }
 
         // Only allow if not yet started
         return $poll->started_at === null;
+    }
+
+    /**
+     * Determine whether the user can open the poll
+     * @param User $user
+     * @param Poll $poll
+     * @return mixed
+     */
+    public function close(User $user, Poll $poll)
+    {
+        // Only allow admins
+        if (!$user->can('admin')) {
+            return false;
+        }
+
+        // Only allow if not yet stopped but running for a bit
+        return $poll->ended_at === null
+            && $poll->started_at !== null
+            && $poll->started_at <= Date::now()->subSeconds(15);
     }
 
     /**
@@ -115,11 +190,11 @@ class PollPolicy
     public function delete(User $user, Poll $poll)
     {
         // Only allow admins
-        if (!Gate::forUser($user)->allows('admin')) {
+        if (!$user->can('admin')) {
             return false;
         }
 
         // Only allow if not yet started
-        return $poll->started_at === null;
+        return $poll->started_at === null && $poll->ended_at === null;
     }
 }

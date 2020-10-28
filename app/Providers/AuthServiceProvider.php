@@ -15,6 +15,8 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected $policies = [
         \App\Models\Poll::class => \App\Policies\PollPolicy::class,
+        \App\Models\PollApproval::class => \App\Policies\PollApprovalPolicy::class,
+        \App\Models\User::class => \App\Policies\UserPolicy::class,
     ];
 
     /**
@@ -27,7 +29,10 @@ class AuthServiceProvider extends ServiceProvider
 
         // User policies
         Gate::define('view', static fn ($user) => $user->exists);
-        Gate::define('vote', static fn ($user) => $user->is_voter || ($user->can_proxy && $user->proxyFor));
+        Gate::define('vote', static fn ($user) => (
+            ($user->is_voter && $user->proxy_id === null) ||
+            ($user->can_proxy && $user->proxyFor !== null)
+        ));
         Gate::define('admin', static fn ($user) => $user->is_admin);
         Gate::define('monitor', static fn ($user) => $user->is_monitor);
     }

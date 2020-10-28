@@ -10,6 +10,9 @@
     {{-- Stylesheet and Javascript --}}
     <link rel="stylesheet" href="{{ mix('css/app.css') }}">
     <script src="{{ mix('js/app.js') }}"></script>
+
+    {{-- Livewire --}}
+    @livewireStyles
 </head>
 
 <body class="bg-grey-secondary">
@@ -34,8 +37,11 @@
         <div class="text-right">
             @auth
             Ingelogd als <strong>{{ request()->user()->name }}</strong><br />
+            @can('monitor')
+            <a href="{{ route('monitor.index') }}">Controle</a>&nbsp;
+            @endcan
             @can('admin')
-            <a href="{{ route('admin.home') }}">Admin</a>&nbsp;
+            <a href="{{ route('admin.index') }}">Admin</a>&nbsp;
             @endcan
             <button type="submit" form="logout" class="appearance-none underline hover:no-underline">Uitloggen</button>
             @else
@@ -71,6 +77,8 @@
 
     {{-- Logout form --}}
     <form action="{{ route('logout') }}" method="post" id="logout">@csrf</form>
-</body>
 
+    {{-- Livewire --}}
+    @livewireScripts
+</body>
 </html>

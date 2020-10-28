@@ -20,6 +20,28 @@ class User extends Authenticatable
     use HasFactory;
     use Notifiable;
 
+    public static function getEligibleUsers(): EligibleUsers
+    {
+        // Count
+        $votePresent = User::where([
+            'is_present' => true,
+            'is_voter' => true
+        ])->count();
+
+        $voteProxied = User::query()
+            ->where('is_present', true)
+            ->where(static fn ($query) =>
+            $query->where('is_voter', true)
+                ->orWhere('can_proxy', true))
+            ->whereHas('proxyFor')
+            ->count();
+
+        $voteCount = $voteProxied + $votePresent;
+
+        // Return present, proxied and total
+        return new EligibleUsers($votePresent, $voteProxied, $voteCount);
+    }
+
     /**
      * Returns TOTP configured to 8 digits
      * @param null|string $secret

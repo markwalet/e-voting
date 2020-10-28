@@ -7,6 +7,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\DB;
 
 class Poll extends Model
 {
@@ -17,7 +18,10 @@ class Poll extends Model
     protected $casts = [
         'started_at' => 'datetime',
         'ended_at' => 'datetime',
-        'results' => 'json'
+        'completed_at' => 'datetime',
+        'results' => 'json',
+        'start_count' => 'int',
+        'end_count' => 'int',
     ];
 
     /**
@@ -34,7 +38,18 @@ class Poll extends Model
      */
     public function votes(): HasMany
     {
-        return $this->hasMany(PollVote::class);
+        return $this->hasMany(PollVote::class)
+            ->orderBy('created_at');
+    }
+
+    /**
+     * Approvals by the monitors
+     * @return HasMany<PollVote>
+     */
+    public function approvals(): HasMany
+    {
+        return $this->hasMany(PollApproval::class)
+            ->orderByAsc('created_at');
     }
 
     /**
@@ -51,7 +66,7 @@ class Poll extends Model
         }
 
         // Refuse if ended
-        if ($this->ended_at !== null || $this->ended_at <= $now) {
+        if ($this->ended_at !== null && $this->ended_at <= $now) {
             return false;
         }
 
@@ -68,5 +83,31 @@ class Poll extends Model
             return 'Open';
         }
         return 'Concept';
+    }
+
+    /**
+     * Returns alleged poll results
+     * @return null|PollResults
+     */
+    public function calculateResults(): ?PollResults
+    {
+        if ($this->started_at === null ||  $this->ended_at === null) {
+            return null;
+        }
+
+        // Get votes
+        $results = $this->votes()
+            ->reorder()
+            ->groupBy('vote')
+            ->select('vote', DB::raw('COUNT(*) as count'))
+            ->get()
+            ->pluck('count', 'vote');
+
+        // Map to model
+        return new PollResults(
+            $results['favor'] ?? 0,
+            $results['against'] ?? 0,
+            $results['blank'] ?? 0,
+        );
     }
 }

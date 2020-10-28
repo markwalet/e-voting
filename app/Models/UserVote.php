@@ -22,6 +22,15 @@ class UserVote extends Model
     ];
 
     /**
+     * The attributes that are mass assignable.
+     * @var array<string>
+     */
+    protected $fillable = [
+        'poll_id',
+        'user_id'
+    ];
+
+    /**
      * Associated poll
      * @return BelongsTo<Poll>
      */

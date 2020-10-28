@@ -16,6 +16,10 @@
     @apply bg-blue-100 border-blue-600 text-blue-600;
 }
 
+.notice--brand {
+    @apply bg-brand-100 border-brand-600 text-brand-600;
+}
+
 .notice__title {
     @apply block text-sm uppercase mb-2;
 }

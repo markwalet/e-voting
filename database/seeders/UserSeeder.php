@@ -20,9 +20,7 @@ class UserSeeder extends Seeder
         'admin' => [
             'name' => 'Admin without votes',
             'phone' => '06 13 736 942',
-            'is_voter' => false,
             'is_admin' => true,
-            'can_proxy' => false,
         ],
         'admin-vote' => [
             'name' => 'Admin with votes',
@@ -42,22 +40,21 @@ class UserSeeder extends Seeder
             'name' => 'Lid',
             'phone' => '+31 232661050',
             'is_voter' => true,
-            'is_admin' => false,
             'can_proxy' => true,
         ],
         'junior' => [
             'name' => 'Begunstiger',
             'phone' => '+31 613473336',
-            'is_voter' => false,
-            'is_admin' => false,
             'can_proxy' => true,
         ],
         'observer' => [
             'name' => 'Oud-lid',
             'phone' => '0031 (0)6 49 67 30 16',
-            'is_voter' => false,
-            'is_admin' => false,
-            'can_proxy' => false,
+        ],
+        'monitor' => [
+            'name' => 'Monitor lid',
+            'phone' => '0031 (0)6 49 66 30 16',
+            'is_monitor' => true
         ],
     ];
 

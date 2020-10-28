@@ -15,46 +15,11 @@ class UserController extends AdminController
      * @param Request $request
      * @return Response
      */
-    public function index(Request $request)
+    public function index()
     {
-        // Get only param
-        $only = $request->get('filter');
-
-        // Get users
-        $query = User::query()
-            ->orderBy('name');
-
-        // Add filters
-        if ($only === 'proxy') {
-            $query->has('proxy');
-        } elseif ($only === 'is-proxy') {
-            $query->has('proxyFor');
-        } elseif ($only === 'present') {
-            $query->where('is_present', true);
-        } elseif ($only !== 'all') {
-            $query->hasVoteRights();
-        }
-
-        // Count
-        $present = User::where([
-            'is_present' => true,
-            'is_voter' => true
-        ])->count();
-        $proxied = User::query()
-            ->where('is_present', true)
-            ->where(static fn ($query) =>
-                $query->where('is_voter', true)
-                    ->orWhere('can_proxy', true))
-            ->whereHas('proxyFor')
-            ->count();
-
         // Get response
         return \response()
-            ->view('admin.users.list', [
-                'users' => $query->paginate(250),
-                'present' => $present,
-                'proxied' => $proxied,
-            ]);
+            ->view('admin.users.list');
     }
 
     /**
@@ -64,35 +29,17 @@ class UserController extends AdminController
      */
     public function show(User $user)
     {
+        // Determine proxies
+        $proxies = [];
+        if ($user->is_voter) {
+            $proxies = User::where('can_proxy', '1')
+                ->doesntHave('proxyFor')
+                ->where('id', '!=', $user->id)
+                ->pluck('name', 'id');
+        }
+
         return response()
-            ->view('admin.users.show', compact('user'));
-    }
-
-    /**
-     * Marks the user as present or absent
-     * @param Request $request
-     * @param User $user
-     * @return void
-     */
-    public function markPresent(Request $request, User $user)
-    {
-        // Check
-        $valid = $request->validate([
-            'present' => ['required', Rule::in(['yes', 'no'])]
-        ]);
-
-        // Save, removing the monitor role if no longer present
-        $user->is_present = $valid['present'] === 'yes';
-        $user->is_monitor = $user->is_monitor && $user->is_present;
-        $user->save();
-
-        // Notify and go back
-        $this->sendNotice(
-            'De gebruiker "%s" is nu gemarkeerd als "%s"',
-            $user->name,
-            $user->is_present ? 'aanwezig' : 'afwezig'
-        );
-        return \redirect()->back();
+            ->view('admin.users.show', compact('user', 'proxies'));
     }
 
     /**

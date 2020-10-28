@@ -5,6 +5,7 @@ $options = [
     'blank' => 'Onthouding'
 ];
 $user = request()->user();
+$proxy = $user->proxyFor;
 $voteUsers = [
     $user->can('vote', $poll)
 ]
@@ -17,6 +18,10 @@ $voteUsers = [
     </div>
 
     {{-- Actions --}}
+    @can('vote')
+    @include('partials.poll.vote-self', compact('user', 'poll', 'proxy'))
+    @includeWhen($proxy === null, 'partials.poll.vote-proxy', compact('user', 'poll', 'proxy'))
+    @endcan
     <p class="text-lg">Voor <strong>Roelof Roos</strong> (jezelf)</p>
     <div class="poll-options">
         @foreach ($options as $value => $label)
