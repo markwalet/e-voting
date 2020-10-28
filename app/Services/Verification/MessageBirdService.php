@@ -71,7 +71,7 @@ class MessageBirdService implements SendsNotifications
     public function sendVerificationCode(string $recipient, string $body): bool
     {
         // Fail if missing params
-        if (empty($recipient) || empty($message)) {
+        if (empty($recipient) || empty($body)) {
             return false;
         }
 
