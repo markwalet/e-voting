@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 class LoginController extends Controller
 {
     private const RESEND_MESSAGE = <<<'TXT'
-    Er is binnen de afgelopen 90 seconden al een code gestuurd. Deze is nog geldig.
+    Er is binnen de afgelopen 90 seconden al een code gestuurd.
     TXT;
 
     private const SEND_MESSAGE = <<<'TXT'
@@ -131,8 +131,8 @@ class LoginController extends Controller
         // Get the token
         $token = $valid['token'];
 
-        // Validate the token
-        if (!$user->totp->verify($token)) {
+        // Validate the token, with a 3-period window (90 seconds)
+        if (!$user->totp->verify($token, null, 3)) {
             return \response()
                 ->redirectToRoute('login.verify')
                 ->with('message', 'De opgegeven code is onjuist');
