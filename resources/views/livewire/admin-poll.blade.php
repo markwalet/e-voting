@@ -32,6 +32,12 @@
 
     @if ($poll->completed_at)
     @include('livewire.parts.poll-details.short-summary')
+
+    @slot('label')
+    <a href="{{ route('admin.polls.download', compact('poll')) }}" class="btn btn--brand btn--narrow m-0">
+        Downloaden
+    </a>
+    @endslot
     @endif
 </div>
 

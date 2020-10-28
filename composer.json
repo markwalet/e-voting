@@ -21,6 +21,7 @@
         "laravel/tinker": "^2.0",
         "livewire/livewire": "^2.3",
         "messagebird/php-rest-api": "^1.19",
+        "phpoffice/phpspreadsheet": "^1.15",
         "spomky-labs/otphp": "^10.0"
     },
     "require-dev": {

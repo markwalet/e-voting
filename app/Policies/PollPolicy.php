@@ -291,4 +291,26 @@ class PollPolicy
             $this->complete($user, $poll) &&
             $poll->approvals()->count() >= 1;
     }
+
+    /**
+     * Can the user download
+     * @param User $user
+     * @param Poll $poll
+     * @return void
+     */
+    public function download(User $user, Poll $poll)
+    {
+        // Only allow admins
+        if (!$user->can('admin')) {
+            return false;
+        }
+
+        // Only allow if finished
+        return $poll->started_at !== null
+            && $poll->ended_at !== null
+            && $poll->completed_at !== null
+            && $poll->started_at < Date::now()
+            && $poll->ended_at < Date::now()
+            && $poll->completed_at < Date::now();
+    }
 }

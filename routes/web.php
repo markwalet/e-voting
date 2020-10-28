@@ -47,12 +47,8 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(static functi
         // Add
         Route::post('/create', [PollController::class, 'store'])->name('polls.create');
 
-        // Start and stop
-        Route::post('/{poll}/open', [PollController::class, 'open'])->name('polls.open');
-        Route::post('/{poll}/close', [PollController::class, 'close'])->name('polls.close');
-
-        // Delete concepts
-        Route::post('/{poll}/delete', [PollController::class, 'delete'])->name('polls.delete');
+        // Download
+        Route::post('/{poll}/download', [PollController::class, 'download'])->name('polls.download');
     });
 
     // Manage users
