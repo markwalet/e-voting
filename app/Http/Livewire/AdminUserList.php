@@ -14,6 +14,11 @@ class AdminUserList extends Component
     public string $search = '';
     public string $filter = 'can-vote-present';
 
+    protected $queryString = [
+        'search' => ['except' => ''],
+        'filter' => ['except' => 'can-vote-present'],
+    ];
+
     /**
      * Returns a collection of users for the given filters and
      * search query

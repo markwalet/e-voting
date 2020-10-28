@@ -164,7 +164,7 @@ class Poll extends Model
             $this->start_count != $this->end_count ||
             $this->votes_count > $this->start_count
         ) {
-            return false;
+            return true;
         }
 
         // Check vote times
@@ -172,7 +172,14 @@ class Poll extends Model
         $lastVote = $this->votes()->latest()->first();
 
         // Warn if outside of window
-        return $firstVote->created_at < $this->started_at
-            || $lastVote->created_at >= $this->ended_at;
+        if ($firstVote && $firstVote->created_at < $this->started_at) {
+            return true;
+        }
+        if ($lastVote && $lastVote->created_at >= $this->ended_at) {
+            return true;
+        }
+
+        // No weirdness
+        return false;
     }
 }

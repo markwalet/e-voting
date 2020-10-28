@@ -22,4 +22,3 @@
 @else
 <p>Je kan momenteel geen oordeel uitbrengen op deze stemming.</p>
 @endif
-@endif

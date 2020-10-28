@@ -15,6 +15,11 @@ class AdminPollList extends Component
     public string $search = '';
     public string $filter = 'recent';
 
+    protected $queryString = [
+        'search' => ['except' => ''],
+        'filter' => ['except' => 'recent'],
+    ];
+
     /**
      * Returns a paginated collection of polls
      * @return LengthAwarePaginator
