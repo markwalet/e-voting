@@ -67,11 +67,11 @@ class PollPolicy
 
         // Handle proxy
         if ($proxy) {
-            return $this->voteProxy($user, $poll, $proxy);
+            return $this->voteProxy($user, $proxy);
         }
 
         // Handle normal
-        return $this->voteSelf($user, $poll);
+        return $this->voteSelf($user);
     }
 
     /**
@@ -80,7 +80,7 @@ class PollPolicy
      * @param Poll $poll
      * @return bool
      */
-    public function voteSelf(User $user, Poll $poll): bool
+    private function voteSelf(User $user): bool
     {
         // Only if voting is allowed
         if (!$user->is_voter) {
@@ -102,7 +102,7 @@ class PollPolicy
      * @param Poll $poll
      * @return bool
      */
-    public function voteProxy(User $user, Poll $poll, User $proxy): bool
+    private function voteProxy(User $user, User $proxy): bool
     {
         // Only if the user can proxy and is the proxy
         if (!$user->can_proxy || !$user->proxyFor->is($proxy)) {
