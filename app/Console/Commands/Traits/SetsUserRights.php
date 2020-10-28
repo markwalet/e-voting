@@ -99,7 +99,7 @@ trait SetsUserRights
      * @param int $id
      * @return bool
      */
-    protected function shouldCreateUser(ConscriboService $service, int $id): bool
+    protected function shouldProcessUser(ConscriboService $service, int $id): bool
     {
         // Get groups
         $groups = $this->getGroupMembers($service);

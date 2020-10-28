@@ -25,7 +25,11 @@ class Kernel extends ConsoleKernel
     // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('vote:assign-permissions')->hourly();
+        // Update all users hourly
+        $schedule->command('vote:create-users', ['--update'])->hourlyAt(15);
+
+        // Create missing users daily
+        $schedule->command('vote:create-users', ['--update'])->dailyAt('06:45');
     }
 
     /**

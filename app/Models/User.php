@@ -149,6 +149,15 @@ class User extends Authenticatable
     }
 
     /**
+     * Returns all approvals the user has cast
+     * @return HasMany
+     */
+    public function pollApprovals(): HasMany
+    {
+        return $this->hasMany(PollApproval::class);
+    }
+
+    /**
      * Returns the role the user has
      * @return string
      */

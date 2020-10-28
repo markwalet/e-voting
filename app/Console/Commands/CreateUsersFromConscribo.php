@@ -21,13 +21,17 @@ class CreateUsersFromConscribo extends ProductionCommand
      * The name and signature of the console command.
      * @var string
      */
-    protected $signature = 'vote:create-users';
+    protected $signature = <<<'CMD'
+    vote:create-users
+        { --prune : Remove users not in Conscribo }
+        { --update : Don't add new users, only update }
+    CMD;
 
     /**
      * The console command description.
      * @var string
      */
-    protected $description = 'Creates users from Conscribo, that are likely to use this sytem.';
+    protected $description = 'Pulls data from Conscribo, optionally only updates or prunes missing.';
 
     /**
      * Execute the console command.
@@ -40,11 +44,50 @@ class CreateUsersFromConscribo extends ProductionCommand
         $people = collect($service->getResource('persoon'));
         $this->info("Retrieved {$people->count()} user(s)");
 
-        // Disable fill protections
-        $this->createOrUpdateUsersWithRoles($service, $people);
+        // Create and update according to data
+        $this->createOrUpdateUsersWithRoles(
+            $service,
+            $people,
+            ((bool) $this->option('update')) === false
+        );
 
-        // Assign admin roles
-        $this->call('vote:assign-permissions', ['--admin']);
+        // Remove excess if --prune
+        if ($this->option('prune')) {
+            // Get IDs
+            $userIds = collect($people)
+                ->filter(static fn ($row) => !empty($row['code']))
+                ->map(static fn ($row) => \filter_var($row['code'], \FILTER_VALIDATE_INT))
+                ->values()
+                ->all();
+
+            // Find users that don't match
+            $users = User::whereNotIn('conscribo_id', $userIds)
+                ->get(['id', 'name']);
+
+            // Drop users
+            foreach ($users as $user) {
+                \assert($user instanceof User);
+
+                // Delete vote records
+                $user->votes()->delete();
+
+                // Delete vote approvals
+                $user->pollApprovals()->delete();
+
+                // Check for a proxy
+                if ($user->proxyFor) {
+                    $proxy = $user->proxyFor;
+                    $proxy->proxy()->dissociate();
+                    $proxy->save();
+                }
+
+                // Delete user
+                $user->delete();
+
+                // Log
+                $this->line("Pruned <info>{$user->name}</>");
+            }
+        }
 
         // Done
         return 0;
@@ -54,10 +97,14 @@ class CreateUsersFromConscribo extends ProductionCommand
      * Update or create users
      * @param Collection<array> $users
      * @param Collection<array<int>> $roles
+     * @param bool $allowCreation
      * @return void
      */
-    public function createOrUpdateUsersWithRoles(ConscriboService $service, Collection $users): void
-    {
+    public function createOrUpdateUsersWithRoles(
+        ConscriboService $service,
+        Collection $users,
+        bool $allowCreation = true
+    ): void {
         User::unguard();
 
         // Prep counts
@@ -90,13 +137,18 @@ class CreateUsersFromConscribo extends ProductionCommand
             }
 
             // Check if user should be created
-            if (!$this->shouldCreateUser($service, $userId)) {
+            if (!$this->shouldProcessUser($service, $userId)) {
                 $this->comment("Ignoring {$userName}, no rights");
                 continue;
             }
 
             // Find the user
             $user = User::firstOrNew(['conscribo_id' => $userId]);
+
+            if (!$allowCreation && !$user->exists) {
+                $this->comment("Ignoring {$userName}, only updating");
+                continue;
+            }
 
             // Build the name
             $user->name = implode(' ', array_filter([
