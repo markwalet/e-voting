@@ -22,3 +22,15 @@ Pwetty grid
 .number-grid__separator {
     @apply py-6 mx-2 text-4xl;
 }
+
+.number-grid--small .number-grid__tile {
+    width: auto;
+}
+
+.number-grid--small .number-grid__number {
+    @apply text-lg px-4 py-2;
+}
+
+.number-grid--small .number-grid__separator {
+    @apply text-lg py-2;
+}

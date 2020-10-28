@@ -29,6 +29,10 @@
     <button class="w-1/4 btn btn--link btn--narrow" disabled>Afronden</button>
     @endif
     @endif
+
+    @if ($poll->completed_at)
+    @include('livewire.parts.poll-details.short-summary')
+    @endif
 </div>
 
 {{-- Approval section --}}
