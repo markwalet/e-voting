@@ -1,0 +1,12 @@
+{
+  // Configure PHP_CodeSniffer
+  "phpcs.executablePath": "./vendor/bin/phpcs",
+  "phpcs.autoConfigSearch": true,
+
+  // Don't auto-complete PHP, let PHP-Intellisense work it out.
+  "php.suggest.basic": false,
+
+  // Allow tailwind's custom directives
+  "css.lint.unknownAtRules": "ignore",
+  "css.validate": false,
+}
