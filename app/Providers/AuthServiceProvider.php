@@ -30,8 +30,10 @@ class AuthServiceProvider extends ServiceProvider
         // User policies
         Gate::define('view', static fn ($user) => $user->exists);
         Gate::define('vote', static fn ($user) => (
-            ($user->is_voter && $user->proxy_id === null) ||
-            ($user->can_proxy && $user->proxyFor !== null)
+            $user->is_present && (
+                ($user->is_voter && $user->proxy_id === null) ||
+                ($user->can_proxy && $user->proxyFor !== null)
+            )
         ));
         Gate::define('admin', static fn ($user) => $user->is_admin);
         Gate::define('monitor', static fn ($user) => $user->is_monitor);
