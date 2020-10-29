@@ -6,7 +6,7 @@
 
 @if (!$this->user->can('vote', $poll) && (!$this->proxy || !$this->user->can('vote', [$poll, $this->proxy])))
 {{-- Report not-available to vote --}}
-<div class="notice notice--info">Je kan niet stemmen op deze stemming</div>
+<div class="notice notice--info">Je kan niet stemmen op dit voorstel</div>
 @elseif ($this->user->can('castVote', $poll) && $this->expand)
 {{-- Get self vote --}}
 @include('livewire.parts.vote-buttons', ['type' => 'user'])

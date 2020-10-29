@@ -10,7 +10,7 @@ $user = Auth::user();
 </h1>
 
 <p class="text-lg mb-4">
-    Hieronder zie je de stemmingen die op dit moment open zijn.
+    Hieronder zie je de voorstellen die op dit moment open zijn.
 </p>
 
 {{-- Notice if proxied --}}
@@ -35,7 +35,7 @@ $user = Auth::user();
 <livewire:poll-vote-card :poll="$poll" />
 @empty
 <div class="notice notice--info">
-    Er zijn momenteel geen actieve stemmingen.
+    Er zijn momenteel geen actieve voorstellen.
 </div>
 @endforelse
 

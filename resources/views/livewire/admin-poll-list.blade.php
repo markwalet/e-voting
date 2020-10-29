@@ -25,7 +25,7 @@
         <livewire:admin-poll :poll="$poll" :key="$poll->id" />
         @empty
         <div class="notice notice--info">
-            Er zijn geen stemmingen die voldoen aan de zoekresultaten
+            Er zijn geen voorstellen die voldoen aan de zoekresultaten
         </div>
         @endforelse
     </div>

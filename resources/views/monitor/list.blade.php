@@ -13,7 +13,7 @@
 <livewire:monitor-result :poll="$poll" :approval="$approvals->get($poll->id)" :key="$poll->id" />
 @empty
 <div class="notice notice--info">
-    Er zijn geen stemmingen recentelijk gesloten
+    Er zijn geen voorstellen recentelijk gesloten
 </div>
 @endforelse
 

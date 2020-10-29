@@ -11,7 +11,7 @@
 
 <div class="flex items-center justify-stretch w-full">
     <a href="{{ route('admin.users.index') }}" class="btn btn--brand mr-4">Leden</a>
-    <a href="{{ route('admin.polls.index') }}" class="btn btn--brand">stemmingen</a>
+    <a href="{{ route('admin.polls.index') }}" class="btn btn--brand">Voorstellen</a>
 </div>
 
 @endsection

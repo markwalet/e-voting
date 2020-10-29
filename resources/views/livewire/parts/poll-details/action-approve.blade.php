@@ -5,7 +5,7 @@
     gegeven.</p>
 @elsecan('create', [App\Models\PollApproval::class, $poll])
 <p class="text-danger-600">
-    LET OP: met de knoppen hieronder breng je een <strong>bindend</strong> oordeel uit over deze stemming.<br />
+    LET OP: met de knoppen hieronder breng je een <strong>bindend</strong> oordeel uit over dit voorstel.<br />
     Deze kan je hierna niet meer via dit systeem wijzigen.
 </p>
 
@@ -20,5 +20,5 @@
     @endforeach
 </div>
 @else
-<p>Je kan momenteel geen oordeel uitbrengen op deze stemming.</p>
+<p>Je kan momenteel geen oordeel uitbrengen op dit voorstel.</p>
 @endif

@@ -1,5 +1,5 @@
 <h2 class="font-title font-normal text-lg">
-    stemming aanmaken
+    Voorstel aanmaken
 </h2>
 
 <form action="{{ route('admin.polls.create') }}" method="post" class="my-4 flex flex-col items-stretch">
