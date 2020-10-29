@@ -15,6 +15,14 @@ Pwetty grid
     @apply p-6 rounded border border-gray-300;
 }
 
+.number-grid__number--red {
+    @apply text-red-600 border-red-600;
+}
+
+.number-grid__number--green {
+    @apply text-brand-600 border-brand-600;
+}
+
 .number-grid__label {
     @apply text-sm;
 }

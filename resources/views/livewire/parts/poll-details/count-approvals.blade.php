@@ -9,9 +9,4 @@
         <data class="number-grid__number">{{ $judgement->negative }}</data>
         <small class="number-grid__label">Afgekeurd</small>
     </div>
-    <div class="number-grid__separator">&nbsp;</div>
-    <div class="number-grid__tile">
-        <data class="number-grid__number">{{ $judgement->neutral }}</data>
-        <small class="number-grid__label">Geen uitspraak</small>
-    </div>
 </div>

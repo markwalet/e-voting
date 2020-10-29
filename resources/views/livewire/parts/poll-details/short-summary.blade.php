@@ -2,7 +2,8 @@
 $results = $poll->results;
 \assert($result instanceof \App\Models\ArchivedResults);
 $votes = optional($results)->results;
-$approval = optional($results)->approval
+$approval = optional($results)->approval;
+$isApproved = $approval->positive === $approval->total;
 @endphp
 @if ($results)
 <div class="w-full flex flex-col items-stretch md:flex-row md:items-center">
@@ -30,8 +31,8 @@ $approval = optional($results)->approval
 <div class="flex-grow"></div>
 <div class="flex-none number-grid number-grid--small">
     <div class="number-grid__tile">
-        <data class="number-grid__number">{{ sprintf("%.0f", $approval->positive / $approval->total * 100) }}&nbsp;%</data>
-        <small class="number-grid__label">Acceptatie</small>
+        <data class="number-grid__number {{ $isApproved ? 'number-grid__number--green' : 'number-grid__number--red' }}">{{ $isApproved ? 'OK' : 'FAIL' }}</data>
+        <small class="number-grid__label">Telraad</small>
     </div>
 </div>
 </div>
