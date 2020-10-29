@@ -21,8 +21,8 @@ $user = Auth::user();
     Je hebt geen stemrecht op deze ALV.
 @elseif ($user->is_voter && !$user->is_present)
     Je bent niet aangemeld, meld je eerst aan bij het bestuur.
-@elseif ($user->proxyFor !== null)
-    Je hebt {{ $user->proxyFor->name }} gemachtigd. Meld je bij het bestuur
+@elseif ($user->proxy !== null)
+    Je hebt {{ $user->proxy->name }} gemachtigd. Meld je bij het bestuur
     om de machtiging in te trekken.
 @else
     We weten niet waarom
