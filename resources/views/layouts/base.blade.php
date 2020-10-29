@@ -51,40 +51,45 @@
         </div>
     </header>
 
-    <main class="container mx-auto">
-        {{-- Errors --}}
-        @if ($errors->any())
-        <div class="notice notice--danger my-4">
-            <p class="mb-4">Er is wat fout gegaan bij het versturen van de data:</p>
-            <ul>
-                @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-        @endif
+    <main>
+        @yield('content-before')
 
-        {{-- Messages --}}
-        @if (session()->has('message'))
-        <div class="notice notice--warning my-4">
-            <p>{{ session()->pull('message') }}</p>
-        </div>
-        @endif
+        <div class="container mx-auto">
+            {{-- Errors --}}
+            @if ($errors->any())
+            <div class="notice notice--danger my-4">
+                <p class="mb-4">Er is wat fout gegaan bij het versturen van de data:</p>
+                <ul>
+                    @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+            @endif
 
-        {{-- Debug messages --}}
-        @if (Config::get('app.beta') && session()->has('debug-message'))
-        <div class="notice notice--warning my-4">
-            <strong class="text-yellow-700 font-bold block text-sm uppercase">Debug message</strong>
-            <p>{{ session()->pull('debug-message') }}</p>
-        </div>
-        @endif
+            {{-- Messages --}}
+            @if (session()->has('message'))
+            <div class="notice notice--warning my-4">
+                <p>{{ session()->pull('message') }}</p>
+            </div>
+            @endif
 
-        {{-- Title --}}
-        @section('content')
-        <div class="p-8 bg-red-100 border border-red-800 rounded text-center">
-            <p>Something went wrong</p>
+            {{-- Debug messages --}}
+            @if (Config::get('app.beta') && session()->has('debug-message'))
+            <div class="notice notice--warning my-4">
+                <strong class="text-yellow-700 font-bold block text-sm uppercase">Debug message</strong>
+                <p>{{ session()->pull('debug-message') }}</p>
+            </div>
+            @endif
+
+            {{-- Title --}}
+            @section('content')
+            <div class="p-8 bg-red-100 border border-red-800 rounded text-center">
+                <p>Something went wrong</p>
+            </div>
+            @show
         </div>
-        @show
+        @yield('content-after')
     </main>
 
     {{-- Logout form --}}
