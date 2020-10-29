@@ -13,7 +13,7 @@
 <p class="mb-4">
     De huidige applicatie draait op versie <code>{{ $version }}</code>.
 </p>
-
+{{--
 <h2 class="font-title font-bold text-2xl">Download applicatie</h2>
     <a href="{{ route('audit.download') }}" class="btn btn--narrow btn--primary">Download huidige applicatiecode</a>
 
@@ -27,6 +27,7 @@
     </p>
     </p>
 </div>
+--}}
 @endsection
 
 @section('content-after')

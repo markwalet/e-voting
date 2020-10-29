@@ -182,6 +182,8 @@ class AuditController extends Controller
      */
     public function download(): BinaryFileResponse
     {
+        \abort(501);
+
         // Get version
         // Get a list of files
         $files = $this->runCachedCommand('git ls-files');
