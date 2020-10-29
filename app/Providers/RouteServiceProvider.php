@@ -56,6 +56,10 @@ class RouteServiceProvider extends ServiceProvider
         // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
         RateLimiter::for('api', static fn (Request $request) => Limit::perMinute(60));
 
+        // Ensure login is limited
         RateLimiter::for('login', static fn (Request $request) => Limit::perMinute(5)->by($request->ip()));
+
+        // Ensure audit downloads are hightly limited
+        RateLimiter::for('audit-download', static fn (Request $request) => Limit::perHour(60 / 5)->by($request->ip()));
     }
 }

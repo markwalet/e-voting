@@ -17,4 +17,19 @@
     .container--md {
         max-width: calc(theme('screens.md') - theme('spacing.16'));
     }
+    .container--wide {
+        max-width: calc(theme('screens.md'));
+    }
+}
+
+@screen lg {
+    .container--wide {
+        max-width: calc(theme('screens.lg'));
+    }
+}
+
+@screen xl {
+    .container--wide {
+        max-width: calc(theme('screens.xl'));
+    }
 }

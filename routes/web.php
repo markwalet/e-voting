@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Admin\PollController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\AuditController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\MonitorController;
@@ -23,6 +24,8 @@ use Illuminate\Support\Facades\Route;
 
 // Homepage
 Route::get('/', [VoteController::class, 'index'])->name('home');
+Route::get('/audit', [AuditController::class, 'index'])->name('audit');
+Route::get('/audit/download', [AuditController::class, 'download'])->name('audit.download');
 
 // Logout
 Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
