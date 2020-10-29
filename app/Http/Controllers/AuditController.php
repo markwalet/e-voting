@@ -27,10 +27,10 @@ class AuditController extends Controller
     private const STATUS_CMD = <<<'CMD'
     echo "THE SERVER TIME IS"
     date | ts '>'
-    echo "\nGIT STATUS"
+    echo "GIT STATUS"
     git status | ts '>'
-    echo "\nLAST THREE LOG ITEMS"
-    git log -3 --pretty='commit  %H%nAuthor: %an <::EMAIL:%ae:EMAIL::>%nDate:   %aD%n%n%t' | ts '>'
+    echo "LAST THREE LOG ITEMS"
+    git log -3 --pretty='commit  %H%nAuthor: %an <::EMAIL:%ae:EMAIL::>%nDate:   %aD%n%n%s%n%n%b' | ts '>'
     CMD;
 
     private const VERSION_CMD = 'git log -1 --format=\'%H\'';
