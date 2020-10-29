@@ -64,6 +64,9 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(static functi
         Route::post('/{user}/mark-present', [UserController::class, 'markPresent'])->name('users.present');
         Route::post('/{user}/proxy', [UserController::class, 'setProxy'])->name('users.proxy');
         Route::post('/{user}/monitor', [UserController::class, 'setMonitor'])->name('users.monitor');
+
+        // Force a refresh
+        Route::post('/refresh', [UserController::class, 'requestUpdate'])->name('users.refresh');
     });
 });
 

@@ -6,10 +6,15 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Validation\Rule;
 
 class UserController extends AdminController
 {
+    private const UPDATE_EXPIRE = 'admin.expire-update';
+
     /**
      * Lists a filterable set of users
      * @param Request $request
@@ -139,5 +144,46 @@ class UserController extends AdminController
             $user->is_monitor ? 'toegevoegd aan' : 'is verwijderd uit'
         );
         return \redirect()->back();
+    }
+
+    /**
+     * Update the request
+     * @return RedirectResponse
+     */
+    public function requestUpdate()
+    {
+        // Get cache
+        $expire = Cache::get(self::UPDATE_EXPIRE);
+
+        // Decline if not expired
+        if ($expire > Date::now()) {
+            $this->sendNotice('Er loopt al een update voor de leden. Wacht 5 minuten.');
+            return \redirect()
+                ->route('admin.users.index');
+        }
+
+        // Block for 5 minutes
+        Cache::put(self::UPDATE_EXPIRE, Date::now()->addMinutes(5));
+
+        // Call the command
+        try {
+            $ok = Artisan::call('vote:create-users', [
+                '--update' => true
+            ]);
+
+            // Run the command
+            if ($ok === 0) {
+                $this->sendNotice('De leden zijn geüpdatet.');
+            } else {
+                $this->sendNotice('Iets ging kapot. Sorry. Probeer het later opnieuw.');
+            }
+        } catch (\Throwable $e) {
+            $this->sendNotice('Iets ging kapot. Sorry. Probeer het later opnieuw.');
+        } finally {
+            // Redirect back
+            return \redirect()
+                ->route('admin.users.index');
+        }
+
     }
 }
