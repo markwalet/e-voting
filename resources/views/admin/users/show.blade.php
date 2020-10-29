@@ -78,21 +78,21 @@ $facts = [
 </div>
 @endif
 
-<h2 class="font-title text-lg mb-2 mt-4">Instellen als telraad</h2>
+<h2 class="font-title text-lg mb-2 mt-4">Instellen als telcommissie</h2>
 
 @can('setMonitor', $user)
 <form method="POST" action="{{ route('admin.users.monitor', compact('user')) }}" class="rounded shadow px-4">
     @csrf
     <div class="flex flex-row items-center">
         <p class="mr-4">
-            {{ $user->name }} is momenteel {{ $user->is_monitor ? 'wel' : 'geen' }} lid van de telraad
+            {{ $user->name }} is momenteel {{ $user->is_monitor ? 'wel' : 'geen' }} lid van de telcommissie
         </p>
         <button name="action" value="{{ $user->is_monitor ? 'unset' : 'set' }}" class="btn btn--brand btn--narrow">wisselen</button>
     </div>
 </form>
 @else
 <div class="notice">
-    Deze gebruiker kan niet lid worden van de telraad
+    Deze gebruiker kan niet lid worden van de telcommissie
 </div>
 @endcan
 

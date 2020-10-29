@@ -1,12 +1,12 @@
-<h3 class="font-title text-xl mb-2 mt-4">Tijden</h3>
+<h3 class="font-title text-xl mb-2 mt-4">Oordeel</h3>
 
 @if ($approval)
 <p>Je hebt op {{ $approval->created_at->format('d-m-Y \o\m H:i:s (T)') }} een "{{ $approval->result_name }}" beoordeling
     gegeven.</p>
 @elsecan('create', [App\Models\PollApproval::class, $poll])
 <p class="text-danger-600">
-    LET OP: met de knoppen hieronder breng je een <strong>bindend</strong> oordeel uit over dit voorstel.<br />
-    Deze kan je hierna niet meer via dit systeem wijzigen.
+    Via onderstaande knoppen breng je een digitaal oordeel uit over de resultaten van dit voorstel. Dit is enkel een digitale vastlegging. Je
+    moet zelf, als telcommissie, dit communiceren naar de vergadering
 </p>
 
 <div class="flex flex-row items-center w-full">
