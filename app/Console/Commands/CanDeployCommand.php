@@ -21,7 +21,7 @@ class CanDeployCommand extends Command
      * The console command description.
      * @var string
      */
-    protected $description = 'Checks if a new version can be deployed, which can\'t when there\'s an open or unconfirmed vote';
+    protected $description = 'Checks if a new version can be deployed.';
 
     /**
      * Execute the console command.
