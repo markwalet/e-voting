@@ -32,7 +32,10 @@ class CanDeployCommand extends Command
         // Count open plls
         $count = Poll::query()
             ->whereNotNull('started_at')
-            ->whereNUll('completed_at')
+            ->where(static function ($query) {
+                $query->whereNull('ended_at')
+                    ->orWhere('ended_at', '>=', Date::now()->subMinutes(15));
+            })
             ->count();
 
         // Allow if none
