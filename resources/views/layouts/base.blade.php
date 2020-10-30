@@ -23,6 +23,14 @@
     </div>
     @endif
 
+    {{-- Deploy warning --}}
+    @if (Cache::get('sys.in-deploy') === true)
+        <div class="bg-orange-700 text-white text-center px-4 py-2 font-bold">
+            Er wordt een nieuwe versie uitgerold. Verwacht downtime in enkele minuten.
+        </div>
+        @endif
+    @endif
+
     {{-- Header --}}
     <header class="container container--md header">
         {{-- Logo --}}

@@ -58,6 +58,7 @@ dirname($backupOldPath),
 
 @story('deploy')
 deployment_init
+deployment_precheck
 deployment_clone
 deployment_describe
 deployment_link
@@ -99,6 +100,16 @@ echo -e "\nAlso linking public path"
 rm -rvf "{{ $publicDir }}"
 ln -s "{{ $livePath }}/public" "{{ $publicDir }}"
 fi
+@endtask
+
+@task('deployment_precheck')
+    LIVE_ARTISAN="{{ $livepath }}/artisan"
+    if [ -f "$LIVE_ARTISAN" ];
+        if ! php "$LIVE_ARTISAN" vote:can-deploy; then
+            echo "Deployment blocked by application"
+            exit 1
+        fi
+    fi
 @endtask
 
 @task('deployment_clone')
