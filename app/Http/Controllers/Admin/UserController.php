@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
@@ -184,5 +185,43 @@ class UserController extends AdminController
             return \redirect()
                 ->route('admin.users.index');
         }
+    }
+
+    /**
+     * Mark all users as absent
+     * @param Request $request
+     * @return RedirectResponse
+     */
+    public function requestReset(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+        \assert($user instanceof User);
+
+        // Check if allowed
+        $firstSubject = User::where('is_present', '1')->first();
+
+        // Check if there even is a subject
+        if (!$firstSubject) {
+            $this->sendNotice('Er zijn geen mensen aanwezig bij de vergadering.');
+            return \redirect()
+                ->route('admin.users.index');
+        }
+
+        // Check if allowed
+        if (!$user->can('setPresent', $firstSubject)) {
+            $this->sendNotice('Je kan momenteel niet iedereen afmelden.');
+            return \redirect()
+                ->route('admin.users.index');
+        }
+
+        // Update users
+        $count = User::query()
+            ->where('is_present', '1')
+            ->update(['is_present' => 0]);
+
+        // Done
+        $this->sendNotice(sprintf('%d gebruiker(s) gemarkeerd als afwezig', $count));
+        return \redirect()
+            ->route('admin.users.index');
     }
 }

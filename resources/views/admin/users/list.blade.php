@@ -25,4 +25,14 @@
     <button type="submit" class="btn btn--brand btn--wide w-full">Update leden</button>
 </form>
 
+{{-- Mark absent --}}
+<h3 class="font-title text-xl font-bold mb-4">Iedereen afmelden</h3>
+
+<p>Met onderstaande knop markeer je iedereen weer als afwezig.</p>
+
+<form action="{{ route('admin.users.reset') }}" method="post">
+    @csrf
+    <button type="submit" class="btn btn--brand btn--wide w-full">Kickhammer 3000</button>
+</form>
+
 @endsection

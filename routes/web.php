@@ -65,8 +65,9 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(static functi
         Route::post('/{user}/proxy', [UserController::class, 'setProxy'])->name('users.proxy');
         Route::post('/{user}/monitor', [UserController::class, 'setMonitor'])->name('users.monitor');
 
-        // Force a refresh
+        // Global actions
         Route::post('/refresh', [UserController::class, 'requestUpdate'])->name('users.refresh');
+        Route::post('/reset', [UserController::class, 'requestReset'])->name('users.reset');
     });
 });
 
