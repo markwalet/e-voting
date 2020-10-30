@@ -184,6 +184,5 @@ class UserController extends AdminController
             return \redirect()
                 ->route('admin.users.index');
         }
-
     }
 }
