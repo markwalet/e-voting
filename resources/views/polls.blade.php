@@ -14,30 +14,10 @@ $user = Auth::user();
 </p>
 
 {{-- Notice if proxied --}}
-@cannot('vote')
-<div class="notice notice--warning">
-    <strong class="notice__title">Je mag niet stemmen</strong>
-@if (!$user->is_voter)
-    Je hebt geen stemrecht op deze ALV.
-@elseif ($user->is_voter && !$user->is_present)
-    Je bent niet aangemeld, meld je eerst aan bij het bestuur.
-@elseif ($user->proxy !== null)
-    Je hebt {{ $user->proxy->name }} gemachtigd. Meld je bij het bestuur
-    om de machtiging in te trekken.
-@else
-    We weten niet waarom
-@endif
-</div>
-@endcan
+<livewire:home-rights-card />
 
 {{-- render polls --}}
-@forelse ($polls as $poll)
-<livewire:poll-vote-card :poll="$poll" />
-@empty
-<div class="notice notice--info">
-    Er zijn momenteel geen actieve voorstellen.
-</div>
-@endforelse
+<livewire:poll-vote-list />
 
 {{-- done --}}
 @endsection
