@@ -1,6 +1,6 @@
 @php
 $results = $poll->results;
-\assert($result instanceof \App\Models\ArchivedResults);
+\assert($results instanceof \App\Models\ArchivedResults);
 $votes = optional($results)->results;
 $approval = optional($results)->approval;
 $isApproved = $approval->positive === $approval->total;

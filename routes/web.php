@@ -51,7 +51,7 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(static functi
         Route::post('/create', [PollController::class, 'store'])->name('polls.create');
 
         // Download
-        Route::post('/{poll}/download', [PollController::class, 'download'])->name('polls.download');
+        Route::get('/{poll}/download', [PollController::class, 'download'])->name('polls.download');
     });
 
     // Manage users

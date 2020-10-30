@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Writer\Ods;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use UnderflowException;
 
@@ -75,7 +75,7 @@ class PollController extends AdminController
         }
 
         // Determine file name
-        $expectedFile = "exports/vote-{$poll->id}.odt";
+        $expectedFile = "exports/vote-{$poll->id}.ods";
 
         // Check if the file exists
         if (
@@ -88,7 +88,7 @@ class PollController extends AdminController
         }
 
         return Storage::download($expectedFile, sprintf(
-            'Uitslagen stemming %d - %s.odt',
+            'Uitslagen stemming %d - %s.ods',
             $poll->id,
             Str::ascii($poll->title, 'nl')
         ));
@@ -157,7 +157,7 @@ class PollController extends AdminController
         $tempFile = \tempnam(\sys_get_temp_dir(), 'ods-');
 
         // Write to file
-        $writer = new Xlsx($spreadsheet);
+        $writer = new Ods($spreadsheet);
         $writer->save($tempFile);
 
         // Get temp file object
