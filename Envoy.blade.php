@@ -104,7 +104,7 @@ fi
 
 @task('deployment_precheck')
     LIVE_ARTISAN="{{ $livepath }}/artisan"
-    if [ -f "$LIVE_ARTISAN" ];
+    if [ -f "$LIVE_ARTISAN" ]; then
         if ! php "$LIVE_ARTISAN" vote:can-deploy; then
             echo "Deployment blocked by application"
             exit 1
