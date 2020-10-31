@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\AuditController;
 use App\Models\ArchivedResults;
 use App\Models\Poll;
 use Illuminate\Http\File;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Writer\Ods;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use UnderflowException;
@@ -75,7 +78,8 @@ class PollController extends AdminController
         }
 
         // Determine file name
-        $expectedFile = "exports/vote-{$poll->id}.ods";
+        $version = App::make(AuditController::class)->getAppVersion();
+        $expectedFile = "exports/{$version}/vote-{$poll->id}.ods";
 
         // Check if the file exists
         if (
@@ -121,37 +125,33 @@ class PollController extends AdminController
 
         // Get data
         $results = $poll->results;
+        \assert($results instanceof ArchivedResults);
 
-        // Add prime meta
-        $headerData = [
-            [],
-            [null, null, 'datum', 'leden'],
-            [null, 'aanvang', $poll->started_at, $results->startVotes],
-            [null, 'sluiting', $poll->ended_at, $results->endVotes],
-            [],
-            ['ID', 'Datum', 'Stem']
-        ];
+        // Add meta
+        $this->writeTable($sheet, 2, 2, [
+            [null, 'datum', 'leden'],
+            ['aanvang', $poll->started_at, $results->startVotes],
+            ['sluiting', $poll->ended_at, $results->endVotes],
+        ]);
 
-        // Apply data
-        foreach ($headerData as $rowId => $row) {
-            foreach ($row as $cellId => $cell) {
-                $sheet->setCellValueByColumnAndRow($cellId + 1, $rowId + 1, $cell);
-            }
-        }
+        // Add votes
+        $this->writeTable($sheet, 7, 2, [
+            ['optie', 'stemmen'],
+            ['Voor', $results->results->favor],
+            ['Tegen', $results->results->against],
+            ['Onthouding', $results->results->blank],
+        ]);
 
-        // Get offset of data
-        $offset = count($headerData);
+        // Add header
+        $this->writeTable($sheet, 1, 7, [
+            ['Datum', 'Stem']
+        ]);
 
         // Add data below
-        $votes = $results->results;
-        foreach ($votes->votes as $rowId => $vote) {
-            foreach ($vote as $cellId => $cell) {
-                $sheet->setCellValueByColumnAndRow($cellId + 1, $offset + $rowId + 1, $cell);
-            }
-        }
+        $this->writeTable($sheet, 1, 8, $results->results->votes);
 
         // Lock the first few lines
-        $sheet->freezePaneByColumnAndRow(0, $offset);
+        $sheet->freezePaneByColumnAndRow(0, 7);
 
         // Get a temp handle
         $tempFile = \tempnam(\sys_get_temp_dir(), 'ods-');
@@ -171,5 +171,22 @@ class PollController extends AdminController
         );
 
         return $path !== false;
+    }
+
+    /**
+     * Writes the given data
+     * @param Worksheet $sheet
+     * @param int $x
+     * @param int $y
+     * @param array $data
+     * @return void
+     */
+    public function writeTable(Worksheet &$sheet, int $x, int $y, array $data)
+    {
+        foreach ($data as $rowId => $row) {
+            foreach ($row as $cellId => $cell) {
+                $sheet->setCellValueByColumnAndRow($x + $cellId, $y + $rowId, $cell);
+            }
+        }
     }
 }
