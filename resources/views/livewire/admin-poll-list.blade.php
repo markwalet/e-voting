@@ -12,7 +12,7 @@
         <select class="form-select flex-grow" id="search-filter" wire:model="filter">
             <option value="recent">Afgelopen 24 uur bewerkt</option>
             <option value="complete">Alleen afgerond</option>
-            <option value="closed">Allen gesloten</option>
+            <option value="closed">Alleen gesloten</option>
             <option value="open">Alleen open</option>
             <option value="concepts">Alleen concepten</option>
             <option value="all">Niet filteren</option>
